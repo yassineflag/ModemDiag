@@ -1,0 +1,144 @@
+manufacturer: Espressif ESP-AT
+color: '#e7352c'
+profiles:
+  esp32: ESP32 with ESP-AT
+  esp8266: ESP8266 with ESP-AT
+include_3gpp: false
+favorites:
+- label: AT
+  command: AT
+- label: Firmware
+  command: AT+GMR
+- label: Wi-Fi mode
+  command: AT+CWMODE?
+- label: IP address
+  command: AT+CIFSR
+references:
+- https://docs.espressif.com/projects/esp-at/en/latest/esp32/AT_Command_Set/
+- https://docs.espressif.com/projects/esp-at/en/latest/esp32/Get_Started/Hardware_connection.html
+categories:
+- name: Status & Info
+  commands:
+  - name: AT
+    command: AT
+    description: Check ESP-AT UART communication
+    profiles: &id001
+    - esp32
+    - esp8266
+  - name: AT+GMR
+    command: AT+GMR
+    description: Read ESP-AT firmware and SDK version
+    profiles: *id001
+- name: Power & Reset
+  commands:
+  - name: AT+RST
+    command: AT+RST
+    description: Restart the ESP-AT module
+    profiles: *id001
+- name: Wi-Fi
+  commands:
+  - name: AT+CWMODE?
+    command: AT+CWMODE?
+    description: Read Wi-Fi station / access-point mode
+    profiles: *id001
+    caps: AT+CWMODE=?
+  - name: AT+CWMODE
+    command: AT+CWMODE={mode}
+    description: Select Wi-Fi role
+    profiles: *id001
+    params:
+    - id: mode
+      label: Mode
+      default: 1=Station
+      type: select
+      options:
+      - 1=Station
+      - 2=Access point
+      - 3=Both
+  - name: AT+CWLAP
+    command: AT+CWLAP
+    description: Scan nearby Wi-Fi access points
+    profiles: *id001
+  - name: AT+CWJAP
+    command: AT+CWJAP="{ssid}","{password}"
+    description: Join a Wi-Fi access point; inspect WIFI GOT IP
+    profiles: *id001
+    params:
+    - id: ssid
+      label: Ssid
+      default: your-network
+    - id: password
+      label: Password
+      default: ''
+    get: AT+CWJAP?
+  - name: AT+CWQAP
+    command: AT+CWQAP
+    description: Disconnect from the Wi-Fi access point
+    profiles: *id001
+  - name: AT+CIFSR
+    command: AT+CIFSR
+    description: Read local IP and MAC addresses
+    profiles: *id001
+- name: TCP/IP Stack
+  commands:
+  - name: Single connection mode
+    command: AT+CIPMUX=0
+    get: AT+CIPMUX?
+    caps: AT+CIPMUX=?
+    description: Select single-connection mode for the TCP commands below
+    profiles:
+    - esp32
+    - esp8266
+  - name: AT+CIPSTATUS
+    command: AT+CIPSTATUS
+    description: Read IP connection status
+    profiles: *id001
+  - name: AT+CIPSTART
+    command: AT+CIPSTART="TCP","{host}",{port}
+    description: Open a single TCP connection; CIPMUX must be 0
+    profiles: *id001
+    params:
+    - id: host
+      label: Host
+      default: example.test
+    - id: port
+      label: Port
+      default: '1883'
+  - name: AT+CIPSEND
+    command: AT+CIPSEND={length}
+    description: Request exact byte-counted input; use prompt/payload automation
+    profiles: *id001
+    params:
+    - id: length
+      label: Length
+      default: '5'
+  - name: AT+CIPCLOSE
+    command: AT+CIPCLOSE
+    description: Close the single connection
+    profiles: *id001
+- name: Bluetooth LE
+  commands:
+  - name: AT+BLEINIT?
+    command: AT+BLEINIT?
+    description: Read Bluetooth LE role; requires BLE-enabled ESP32 firmware
+    profiles:
+    - esp32
+  - name: AT+BLEINIT
+    command: AT+BLEINIT={role}
+    description: Initialize BLE role on supported ESP32 firmware
+    profiles:
+    - esp32
+    params:
+    - id: role
+      label: Role
+      default: 1=Client
+      type: select
+      options:
+      - 0=Off
+      - 1=Client
+      - 2=Server
+  - name: AT+BLEADDR?
+    command: AT+BLEADDR?
+    description: Read Bluetooth LE address
+    profiles:
+    - esp32

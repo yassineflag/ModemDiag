@@ -1,0 +1,194 @@
+manufacturer: "Telit"
+profiles:
+  me310: ME310G1 / ME910G1 / ML865G1
+color: "#ff6b00"
+
+categories:
+
+  - name: "Version & Identity"
+    commands:
+      - name: "FW Version"
+        command: "AT#SWPKGV"
+        profiles: [me310]
+        description: "Get software package version"
+      - name: "HW Version"
+        command: "AT#HWREV"
+        profiles: [me310]
+        description: "Get hardware revision"
+      - name: "IMEI Lock?"
+        command: "AT#IMEILOCK?"
+        description: "Query IMEI lock status"
+
+  - name: "Band & RAT"
+    commands:
+      - name: "Band Config?"
+        command: "AT#BND?"
+        profiles: [me310]
+        description: "Query current band configuration (2G/3G/4G)"
+      - name: "RAT Selection?"
+        command: "AT+WS46?"
+        profiles: [me310]
+        description: "Query wireless data service (RAT) selection"
+      - name: "LTE Band?"
+        command: "AT#LTEBND?"
+        description: "Query LTE band configuration"
+      - name: "NR5G Band?"
+        command: "AT#NR5GBND?"
+        description: "Query 5G NR band configuration"
+
+  - name: "Network & Signal"
+    commands:
+      - name: "Serving Cell"
+        command: "AT#MONI"
+        profiles: [me310]
+        description: "Get serving cell monitoring info (RSSI, quality)"
+      - name: Cell monitor caps
+        command: AT#MONI=?
+        profiles: [me310]
+        description: Query cell-monitor capabilities and selection; this is not a neighbour-cell scan
+      - name: "Cell Info"
+        command: "AT#CCED?"
+        description: "Cell change event detection data"
+      - name: "5G Info"
+        command: "AT#NR5GINFO"
+        description: "5G NR connection info"
+
+  - name: "Firmware Update"
+    commands:
+      - name: "FOTA Switch"
+        command: "AT#FWSWITCH?"
+        description: "Query firmware image switch state"
+      - name: "FOTA Delta"
+        command: "AT#OTADELTA=?"
+        description: "OTA delta firmware update parameters"
+
+  - name: "GNSS"
+    commands:
+      - name: GNSS Fix
+        command: AT$GPSACP
+        profiles: [me310]
+        description: Read GPS acquisition data; this command does not power on GNSS
+
+      - name: "NMEA Port?"
+        command: "AT$GPSNMUN?"
+        profiles: [me310]
+        description: "Query NMEA sentence output configuration"
+      - name: "Assisted GPS"
+        command: "AT#PGPS"
+        description: "Predicted GPS (A-GPS) configuration"
+
+  - name: "Power & Reset"
+    commands:
+      - name: "Reset"
+        command: "AT#REBOOT"
+        description: "Reboot the module"
+      - name: "Power Down"
+        command: "AT#SHDN"
+        profiles: [me310]
+        description: "Shutdown the module"
+      - name: "Low Power?"
+        command: "AT#LSCFG?"
+        description: "Query low-power sleep configuration"
+
+  - name: TCP/IP Stack
+    commands:
+      - name: AT#SGACT
+        command: AT#SGACT={cid},{state}
+        description: Activate or deactivate the internal IP context
+        profiles:
+        - me310
+        params:
+        - id: cid
+          label: Cid
+          default: '1'
+        - id: state
+          label: State
+          default: 1=Activate
+          type: select
+          options:
+          - 1=Activate
+          - 0=Deactivate
+        get: AT#SGACT?
+      - name: AT#SD
+        command: AT#SD={socket},{protocol},{port},"{host}",0,0,1
+        description: Open a socket in command mode, rather than transparent data mode
+        profiles:
+        - me310
+        params:
+        - id: socket
+          label: Socket
+          default: '1'
+        - id: protocol
+          label: Protocol
+          default: 0=TCP
+          type: select
+          options:
+          - 0=TCP
+          - 1=UDP
+        - id: port
+          label: Port
+          default: '1883'
+        - id: host
+          label: Host
+          default: example.test
+      - name: AT#SS
+        command: AT#SS
+        description: Read socket status
+        profiles:
+        - me310
+
+  - name: MQTT
+    commands:
+      - name: AT#MQEN
+        command: AT#MQEN={instance},{enabled}
+        description: Allocate or release an MQTT client
+        profiles:
+        - me310
+        params:
+        - id: instance
+          label: Instance
+          default: '1'
+        - id: enabled
+          label: Enabled
+          default: 1=Enable
+          type: select
+          options:
+          - 1=Enable
+          - 0=Disable
+        get: AT#MQEN?
+        caps: AT#MQEN=?
+      - name: AT#MQCFG
+        command: AT#MQCFG={instance},"{host}",{port},1
+        description: Configure MQTT broker using PDP context 1; activate that context first
+        profiles:
+        - me310
+        params:
+        - id: instance
+          label: Instance
+          default: '1'
+        - id: host
+          label: Host
+          default: example.test
+        - id: port
+          label: Port
+          default: '1883'
+        get: AT#MQCFG?
+      - name: AT#MQCONN
+        command: AT#MQCONN={instance},"{client}","{user}","{password}"
+        description: Connect and authenticate to a configured MQTT broker
+        profiles:
+        - me310
+        params:
+        - id: instance
+          label: Instance
+          default: '1'
+        - id: client
+          label: Client
+          default: modemdiag
+        - id: user
+          label: User
+          default: ''
+        - id: password
+          label: Password
+          default: ''
+        get: AT#MQCONN?

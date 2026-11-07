@@ -1,0 +1,107 @@
+manufacturer: "Sierra Wireless"
+profiles:
+  wp77: WP77xx
+color: "#e8212a"
+
+categories:
+
+  - name: "Status & Info"
+    commands:
+      - name: "General Status"
+        command: "AT!GSTATUS?"
+        profiles: [wp77]
+        description: "Comprehensive radio status (temp, RSSI, RSRP, bands, etc.)"
+      - name: "SW Info"
+        command: "ATI"
+        profiles: [wp77]
+        description: "Module software/firmware information"
+      - name: "HW Info"
+        command: "AT!PCTEMP?"
+        profiles: [wp77]
+        description: "PC temperature reading"
+      - name: "Detailed SW"
+        command: "AT!VER"
+        description: "Detailed firmware component versions"
+
+  - name: "Security & Access"
+    commands:
+      - name: "Enter CND"
+        command: 'AT!ENTERCND="A710"'
+        description: "Enter engineering command mode (default password A710)"
+      - name: "Leave CND"
+        command: "AT!LEAVECND"
+        description: "Leave engineering command mode"
+
+  - name: "Band & RAT"
+    commands:
+      - name: "Band Config?"
+        command: "AT!BAND?"
+        profiles: [wp77]
+        description: "Query current LTE/NR band configuration"
+      - name: "Band List"
+        command: "AT!BAND=?"
+        profiles: [wp77]
+        description: "List all available band profiles"
+      - name: "Set Auto Band"
+        command: "AT!BAND=00"
+        description: "Set automatic band selection (profile 00)"
+      - name: "LTE CA Info"
+        command: "AT!LTECA?"
+        description: "LTE carrier aggregation information"
+      - name: "NR5G Config?"
+        command: "AT!NR5GWWAN?"
+        description: "5G NR WWAN configuration"
+
+  - name: "GNSS"
+    commands:
+      - name: "GNSS On"
+        command: "AT!GPSTRACK=1,60,100,1,1"
+        profiles: [wp77]
+        description: "Request one standalone position fix (WP families)"
+      - name: "GNSS Off"
+        command: "AT!GPSEND=0"
+        profiles: [wp77]
+        description: "End the active position-fix session (WP families)"
+      - name: "GPS Info"
+        command: "AT!GPSLOC?"
+        profiles: [wp77]
+        description: "Read last known location (WP families)"
+      - name: "GNSS Config?"
+        command: "AT!GPSCONFIG?"
+        description: "Query GNSS engine configuration"
+
+  - name: "Power & Reset"
+    commands:
+      - name: "Reset"
+        command: "AT!RESET"
+        profiles: [wp77]
+        description: "Software reset of the module"
+      - name: "Low Power?"
+        command: "AT!POWERMODE?"
+        description: "Query power mode configuration"
+
+  - name: "Network"
+    commands:
+      - name: "Cell Lock?"
+        command: "AT!CELLOCK?"
+        description: "Query cell lock settings"
+      - name: "Roam Config?"
+        command: "AT!ROAM?"
+        description: "Query roaming configuration"
+      - name: "PLMN Mode?"
+        command: "AT!PLMNMODE?"
+        description: "Query PLMN selection mode"
+
+  - name: Band & RAT
+    commands:
+      - name: AT!SELRAT?
+        command: AT!SELRAT?
+        description: Read preferred radio access technology (WP77xx)
+        profiles:
+        - wp77
+      - name: AT!SELCIOT?
+        command: AT!SELCIOT?
+        description: Read LTE / LTE-M / NB-IoT preferences (WP77xx)
+        profiles:
+        - wp77
+        caps: AT!SELCIOT=?

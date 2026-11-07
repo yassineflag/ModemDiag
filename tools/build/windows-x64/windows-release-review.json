@@ -1,0 +1,573 @@
+{
+  "components": [
+    {
+      "component": "PyQt6",
+      "version": "6.12.0",
+      "files": {
+        "PyQt6/QtCore.pyd": "e1f485f6ed7357874309f468b34886ff55853f156712555e2cd5a9611cca17e7",
+        "PyQt6/QtGui.pyd": "e39e356a92c733d51f20f4dc4a394a8bd305700f2d48a4d3d5dcc1f60f3e779f",
+        "PyQt6/QtNetwork.pyd": "4b3ac5aadda243ec5771b8b2e1db3426af09633c8424372812b771328e2c1846",
+        "PyQt6/QtWidgets.pyd": "f76652920122f80be0ca3d1f8428e84be79bacb904b68edb237cfeecf3d2ea3a"
+      },
+      "notice_file": "windows-notices.txt",
+      "redistribution_basis": "Unmodified official PyPI wheel binaries matched by SHA-256; upstream component copyright and license texts retained. PyYAML includes LibYAML 0.2.5; cffi sources include its Windows libffi support.",
+      "sources": [
+        {
+          "component": "PyQt6",
+          "version": "6.12.0",
+          "url": "https://files.pythonhosted.org/packages/8b/77/73ae0fd2ce7915ce87269743fd11f14f009b8db60a58759afc1c402327f2/pyqt6-6.12.0.tar.gz",
+          "sha256": "d3e021b716bae880224422f9d1b894d2d53de7e60e60dbc43f860723f9cc300b",
+          "file": "PyQt6-6.12.0/pyqt6-6.12.0.tar.gz"
+        }
+      ]
+    },
+    {
+      "component": "PyQt6_sip",
+      "version": "13.13.0",
+      "files": {
+        "PyQt6/sip.cp313-win_amd64.pyd": "771ba1905fb31a6ba298b465013510460f68bc9f43f2928ffa063340e3d3223b"
+      },
+      "notice_file": "windows-notices.txt",
+      "redistribution_basis": "Unmodified official PyPI wheel binaries matched by SHA-256; upstream component copyright and license texts retained. PyYAML includes LibYAML 0.2.5; cffi sources include its Windows libffi support.",
+      "sources": [
+        {
+          "component": "PyQt6_sip",
+          "version": "13.13.0",
+          "url": "https://files.pythonhosted.org/packages/78/35/bed43ff7cf040ced6b62a17b272abecb94914755284b54e8d06844e1ed23/pyqt6_sip-13.13.0.tar.gz",
+          "sha256": "2cd55f575cde208c398d6cfdecc5a13394ed2afb54226210c50e3a6df7c3a997",
+          "file": "PyQt6_sip-13.13.0/pyqt6_sip-13.13.0.tar.gz"
+        }
+      ]
+    },
+    {
+      "component": "cffi",
+      "version": "2.1.1",
+      "files": {
+        "_cffi_backend.cp313-win_amd64.pyd": "21b7160d4a6da9590794fdb38718982060b5c92d56fb0e441fc8b62ee789be8d"
+      },
+      "notice_file": "windows-notices.txt",
+      "redistribution_basis": "Unmodified official PyPI wheel binaries matched by SHA-256; upstream component copyright and license texts retained. PyYAML includes LibYAML 0.2.5; cffi sources include its Windows libffi support.",
+      "sources": [
+        {
+          "component": "cffi",
+          "version": "2.1.1",
+          "url": "https://files.pythonhosted.org/packages/9e/ef/008a1939e372c06329a3fce4279c02f328488f3526744906eeec3da7ad5f/cffi-2.1.1.tar.gz",
+          "sha256": "dd31f52ea1086513bb9df30f8fcee9b8918323ae067a3d5b78bc826a000712be",
+          "file": "cffi-2.1.1/cffi-2.1.1.tar.gz"
+        }
+      ]
+    },
+    {
+      "component": "PyYAML",
+      "version": "6.0.3",
+      "files": {
+        "yaml/_yaml.cp313-win_amd64.pyd": "8a747bb4bb166b3caf53c5ee91931eb1317cc3ad617f18dcd12dd8c181ced226"
+      },
+      "notice_file": "windows-notices.txt",
+      "redistribution_basis": "Unmodified official PyPI wheel binaries matched by SHA-256; upstream component copyright and license texts retained. PyYAML includes LibYAML 0.2.5; cffi sources include its Windows libffi support.",
+      "sources": [
+        {
+          "component": "PyYAML",
+          "version": "6.0.3",
+          "url": "https://files.pythonhosted.org/packages/05/8e/961c0007c59b8dd7729d542c61a4d537767a59645b82a0b521206e1e25c2/pyyaml-6.0.3.tar.gz",
+          "sha256": "d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f",
+          "file": "PyYAML-6.0.3/pyyaml-6.0.3.tar.gz"
+        },
+        {
+          "component": "libyaml",
+          "version": "0.2.5",
+          "url": "https://pyyaml.org/download/libyaml/yaml-0.2.5.tar.gz",
+          "sha256": "c642ae9b75fee120b2d96c712538bd2cf283228d2337df2cf2988e3c02678ef4",
+          "file": "libyaml-0.2.5/yaml-0.2.5.tar.gz"
+        }
+      ]
+    },
+    {
+      "component": "cryptography",
+      "version": "50.0.2",
+      "files": {
+        "cryptography/hazmat/bindings/_rust.pyd": "1d4332a447cab13dec8e3a533ad579e0e562b79e40822c931f33769758fc7156"
+      },
+      "notice_file": "windows-notices.txt",
+      "redistribution_basis": "Exact cp311-abi3 Windows wheel matched by SHA-256. Apache-2.0/BSD component terms retained; Cargo.lock crate sources and wheel SBOM OpenSSL 4.0.3 source are supplied.",
+      "sources": [
+        {
+          "component": "asn1",
+          "version": "0.24.1",
+          "url": "https://static.crates.io/crates/asn1/asn1-0.24.1.crate",
+          "sha256": "c9795210620c0cb3f9a7ce4f882808c38e1ef7b347c90591dceae0886e031fb1",
+          "file": "asn1-0.24.1/asn1-0.24.1.crate"
+        },
+        {
+          "component": "asn1_derive",
+          "version": "0.24.1",
+          "url": "https://static.crates.io/crates/asn1_derive/asn1_derive-0.24.1.crate",
+          "sha256": "909e307f1cc32bb8bccbd98f446e6d1bf03fa30f7b53a4337da7181ad30fa11a",
+          "file": "asn1_derive-0.24.1/asn1_derive-0.24.1.crate"
+        },
+        {
+          "component": "base64",
+          "version": "0.23.0",
+          "url": "https://static.crates.io/crates/base64/base64-0.23.0.crate",
+          "sha256": "b25655df2c3cdd83c5e5b293b88acd880332b2ddadd7c30ac43144fdc0033da9",
+          "file": "base64-0.23.0/base64-0.23.0.crate"
+        },
+        {
+          "component": "bitflags",
+          "version": "2.13.1",
+          "url": "https://static.crates.io/crates/bitflags/bitflags-2.13.1.crate",
+          "sha256": "b588b76d00fde79687d7646a9b5bdf3cc0f655e0bbd080335a95d7e96f3587da",
+          "file": "bitflags-2.13.1/bitflags-2.13.1.crate"
+        },
+        {
+          "component": "cc",
+          "version": "1.4.0",
+          "url": "https://static.crates.io/crates/cc/cc-1.4.0.crate",
+          "sha256": "5add81bb678e6cb321aff7fa0dc7689ad82b112dbc032cea19f91d6b8e3582b9",
+          "file": "cc-1.4.0/cc-1.4.0.crate"
+        },
+        {
+          "component": "cfg-if",
+          "version": "1.0.4",
+          "url": "https://static.crates.io/crates/cfg-if/cfg-if-1.0.4.crate",
+          "sha256": "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801",
+          "file": "cfg-if-1.0.4/cfg-if-1.0.4.crate"
+        },
+        {
+          "component": "cryptography",
+          "version": "50.0.2",
+          "url": "https://files.pythonhosted.org/packages/9d/af/182eb91b0df3fe75c4d9f26fe70684569566745f6ba7e5c9c73a862c5252/cryptography-50.0.2.tar.gz",
+          "sha256": "7b46165bb56eb4704e2eaaf86f3c940d19154535d9b0ca7d6d590b04060e00d5",
+          "file": "cryptography-50.0.2/cryptography-50.0.2.tar.gz"
+        },
+        {
+          "component": "find-msvc-tools",
+          "version": "0.1.9",
+          "url": "https://static.crates.io/crates/find-msvc-tools/find-msvc-tools-0.1.9.crate",
+          "sha256": "5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582",
+          "file": "find-msvc-tools-0.1.9/find-msvc-tools-0.1.9.crate"
+        },
+        {
+          "component": "foreign-types",
+          "version": "0.3.2",
+          "url": "https://static.crates.io/crates/foreign-types/foreign-types-0.3.2.crate",
+          "sha256": "f6f339eb8adc052cd2ca78910fda869aefa38d22d5cb648e6485e4d3fc06f3b1",
+          "file": "foreign-types-0.3.2/foreign-types-0.3.2.crate"
+        },
+        {
+          "component": "foreign-types-shared",
+          "version": "0.1.1",
+          "url": "https://static.crates.io/crates/foreign-types-shared/foreign-types-shared-0.1.1.crate",
+          "sha256": "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b",
+          "file": "foreign-types-shared-0.1.1/foreign-types-shared-0.1.1.crate"
+        },
+        {
+          "component": "heck",
+          "version": "0.5.0",
+          "url": "https://static.crates.io/crates/heck/heck-0.5.0.crate",
+          "sha256": "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea",
+          "file": "heck-0.5.0/heck-0.5.0.crate"
+        },
+        {
+          "component": "itoa",
+          "version": "1.0.18",
+          "url": "https://static.crates.io/crates/itoa/itoa-1.0.18.crate",
+          "sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+          "file": "itoa-1.0.18/itoa-1.0.18.crate"
+        },
+        {
+          "component": "libc",
+          "version": "0.2.189",
+          "url": "https://static.crates.io/crates/libc/libc-0.2.189.crate",
+          "sha256": "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2",
+          "file": "libc-0.2.189/libc-0.2.189.crate"
+        },
+        {
+          "component": "once_cell",
+          "version": "1.21.4",
+          "url": "https://static.crates.io/crates/once_cell/once_cell-1.21.4.crate",
+          "sha256": "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50",
+          "file": "once_cell-1.21.4/once_cell-1.21.4.crate"
+        },
+        {
+          "component": "openssl",
+          "version": "0.10.81",
+          "url": "https://static.crates.io/crates/openssl/openssl-0.10.81.crate",
+          "sha256": "77823a27f0babb03091cb9ed9ef80af3b39dbc82f97e8fa530374b7dafd87a45",
+          "file": "openssl-0.10.81/openssl-0.10.81.crate"
+        },
+        {
+          "component": "openssl",
+          "version": "4.0.3",
+          "url": "https://github.com/openssl/openssl/releases/download/openssl-4.0.3/openssl-4.0.3.tar.gz",
+          "sha256": "325b5c806167c13b40b1ffeadfe0248197c00eccc4cf123ec1e28d2d2fd216d9",
+          "file": "openssl-4.0.3/openssl-4.0.3.tar.gz"
+        },
+        {
+          "component": "openssl-macros",
+          "version": "0.1.1",
+          "url": "https://static.crates.io/crates/openssl-macros/openssl-macros-0.1.1.crate",
+          "sha256": "a948666b637a0f465e8564c73e89d4dde00d72d4d473cc972f390fc3dcee7d9c",
+          "file": "openssl-macros-0.1.1/openssl-macros-0.1.1.crate"
+        },
+        {
+          "component": "openssl-sys",
+          "version": "0.9.117",
+          "url": "https://static.crates.io/crates/openssl-sys/openssl-sys-0.9.117.crate",
+          "sha256": "b47e7e6bb2c38cd930d25a23b40fa52e068c10e85f3e03a7f5ba5aaca5713695",
+          "file": "openssl-sys-0.9.117/openssl-sys-0.9.117.crate"
+        },
+        {
+          "component": "pem",
+          "version": "4.0.0",
+          "url": "https://static.crates.io/crates/pem/pem-4.0.0.crate",
+          "sha256": "d354a98a3d1251555de99e8fdd8afda05573c31b82f59063a7b0a29b5527f120",
+          "file": "pem-4.0.0/pem-4.0.0.crate"
+        },
+        {
+          "component": "pkg-config",
+          "version": "0.3.33",
+          "url": "https://static.crates.io/crates/pkg-config/pkg-config-0.3.33.crate",
+          "sha256": "19f132c84eca552bf34cab8ec81f1c1dcc229b811638f9d283dceabe58c5569e",
+          "file": "pkg-config-0.3.33/pkg-config-0.3.33.crate"
+        },
+        {
+          "component": "portable-atomic",
+          "version": "1.14.0",
+          "url": "https://static.crates.io/crates/portable-atomic/portable-atomic-1.14.0.crate",
+          "sha256": "3d20d5497ef88037a52ff98267d066e7f11fcc5e99bbfbd58a42336193aacec3",
+          "file": "portable-atomic-1.14.0/portable-atomic-1.14.0.crate"
+        },
+        {
+          "component": "proc-macro2",
+          "version": "1.0.107",
+          "url": "https://static.crates.io/crates/proc-macro2/proc-macro2-1.0.107.crate",
+          "sha256": "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9",
+          "file": "proc-macro2-1.0.107/proc-macro2-1.0.107.crate"
+        },
+        {
+          "component": "pyo3",
+          "version": "0.29.2",
+          "url": "https://static.crates.io/crates/pyo3/pyo3-0.29.2.crate",
+          "sha256": "4688ddedf473e32662b9b067670129a8afb8c18e351482c70d62ba4a88171e8b",
+          "file": "pyo3-0.29.2/pyo3-0.29.2.crate"
+        },
+        {
+          "component": "pyo3-build-config",
+          "version": "0.29.2",
+          "url": "https://static.crates.io/crates/pyo3-build-config/pyo3-build-config-0.29.2.crate",
+          "sha256": "f41027e41b4bd03f6e60f9f417fe24a6341a6bb744edd62b6f709f2a52ea30e9",
+          "file": "pyo3-build-config-0.29.2/pyo3-build-config-0.29.2.crate"
+        },
+        {
+          "component": "pyo3-ffi",
+          "version": "0.29.2",
+          "url": "https://static.crates.io/crates/pyo3-ffi/pyo3-ffi-0.29.2.crate",
+          "sha256": "e591a95526fead067432c3b3a33fc74770b87b1e04e73671090d9c2055a2b327",
+          "file": "pyo3-ffi-0.29.2/pyo3-ffi-0.29.2.crate"
+        },
+        {
+          "component": "pyo3-macros",
+          "version": "0.29.2",
+          "url": "https://static.crates.io/crates/pyo3-macros/pyo3-macros-0.29.2.crate",
+          "sha256": "73225868fc1cd84eef2c3c230ddb91273bf1de46aeb8a4248da76d32a0924a1c",
+          "file": "pyo3-macros-0.29.2/pyo3-macros-0.29.2.crate"
+        },
+        {
+          "component": "pyo3-macros-backend",
+          "version": "0.29.2",
+          "url": "https://static.crates.io/crates/pyo3-macros-backend/pyo3-macros-backend-0.29.2.crate",
+          "sha256": "571575aa3749fa6216757dd47d2a3e7ef360f329a40f0666a9fbd14889024952",
+          "file": "pyo3-macros-backend-0.29.2/pyo3-macros-backend-0.29.2.crate"
+        },
+        {
+          "component": "quote",
+          "version": "1.0.47",
+          "url": "https://static.crates.io/crates/quote/quote-1.0.47.crate",
+          "sha256": "1fbf4db142a473a8d80c26bbf18454ed458bf8d26c8219c331daecfdbd079001",
+          "file": "quote-1.0.47/quote-1.0.47.crate"
+        },
+        {
+          "component": "self_cell",
+          "version": "1.3.0",
+          "url": "https://static.crates.io/crates/self_cell/self_cell-1.3.0.crate",
+          "sha256": "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813",
+          "file": "self_cell-1.3.0/self_cell-1.3.0.crate"
+        },
+        {
+          "component": "shlex",
+          "version": "2.0.1",
+          "url": "https://static.crates.io/crates/shlex/shlex-2.0.1.crate",
+          "sha256": "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba",
+          "file": "shlex-2.0.1/shlex-2.0.1.crate"
+        },
+        {
+          "component": "syn",
+          "version": "2.0.119",
+          "url": "https://static.crates.io/crates/syn/syn-2.0.119.crate",
+          "sha256": "872831b642d1a07999a962a351ed35b955ea2cfc8f3862091e2a240a84f17297",
+          "file": "syn-2.0.119/syn-2.0.119.crate"
+        },
+        {
+          "component": "target-lexicon",
+          "version": "0.13.5",
+          "url": "https://static.crates.io/crates/target-lexicon/target-lexicon-0.13.5.crate",
+          "sha256": "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca",
+          "file": "target-lexicon-0.13.5/target-lexicon-0.13.5.crate"
+        },
+        {
+          "component": "unicode-ident",
+          "version": "1.0.24",
+          "url": "https://static.crates.io/crates/unicode-ident/unicode-ident-1.0.24.crate",
+          "sha256": "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75",
+          "file": "unicode-ident-1.0.24/unicode-ident-1.0.24.crate"
+        },
+        {
+          "component": "vcpkg",
+          "version": "0.2.15",
+          "url": "https://static.crates.io/crates/vcpkg/vcpkg-0.2.15.crate",
+          "sha256": "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426",
+          "file": "vcpkg-0.2.15/vcpkg-0.2.15.crate"
+        }
+      ]
+    },
+    {
+      "component": "Qt",
+      "version": "6.12.0",
+      "files": {
+        "PyQt6/Qt6/bin/Qt6Core.dll": "39175459c4837c8cc0f709a637fb6eadb25d696785109c8393559ec876f02703",
+        "PyQt6/Qt6/bin/Qt6Gui.dll": "37c79b48b9cc2d9a03d21410c26fea683d236f9280f5c9aaab85d980759f2835",
+        "PyQt6/Qt6/bin/Qt6Network.dll": "9825558f184c64f639c4b8663650cee0ae8ffe01c18d98ff76f006a02389965f",
+        "PyQt6/Qt6/bin/Qt6Svg.dll": "cce84059f1857ff1859db7c4fe10334e603d9ca81eb4d5f0a22ca0ac515b340c",
+        "PyQt6/Qt6/bin/Qt6Widgets.dll": "74138ca203c378a62367cc398e4dac07dec729b5a121486dbb26109854c17ae5",
+        "PyQt6/Qt6/plugins/generic/qtuiotouchplugin.dll": "5de903fa0ca5680243c01b8ed7ad0e6c27a6d00c7b29e0a51f581d32e0cdcde7",
+        "PyQt6/Qt6/plugins/iconengines/qsvgicon.dll": "09d02f929b537f9ba83834651b17c70fd89dcacbe22012b9fae3b529efa9c390",
+        "PyQt6/Qt6/plugins/imageformats/qgif.dll": "a1ea6be36c9aedbc54bf88bf391be85f1477d1d80f831f6eaf6a4d10fac8d027",
+        "PyQt6/Qt6/plugins/imageformats/qicns.dll": "1b05278d3e8997d1527a2e65f0806e33279088a92ff0c983164cce99dc78adc3",
+        "PyQt6/Qt6/plugins/imageformats/qico.dll": "964b39989a4a8dccd809c39b8e7d5813990aa31676d1d39b18aeea97336ddab7",
+        "PyQt6/Qt6/plugins/imageformats/qjpeg.dll": "9e67dc18c9f67141f5da20646b63a5ee4a57f8cfdad6b1b3c4c5f70e49ace065",
+        "PyQt6/Qt6/plugins/imageformats/qsvg.dll": "e8f2c80df916b363738d6f6dc112ac4555a42278347e78c0b609a55d1adf70cb",
+        "PyQt6/Qt6/plugins/imageformats/qtga.dll": "d103ddb4c0609f7d1bfe2c788745f1009cae2cd3c5827ef108fe4c8c535dfb3d",
+        "PyQt6/Qt6/plugins/imageformats/qtiff.dll": "f92d403b82755884bc0e20d924da8fd4328426c1c19d4f7b5677ca60b8585bf0",
+        "PyQt6/Qt6/plugins/imageformats/qwbmp.dll": "8225f681ae69327ee519c58b7a9b4d315316584fb9b75c554bd48943f0a3d2ae",
+        "PyQt6/Qt6/plugins/imageformats/qwebp.dll": "237afef6be8253fd57559516b2ba2dbeafdccb72b7416ad41f9fd15548f75172",
+        "PyQt6/Qt6/plugins/networkinformation/qnetworklistmanager.dll": "cc66815a9621f41c7fc4925d320a44f564f5d69722a1a23a731753592e5e8058",
+        "PyQt6/Qt6/plugins/platforms/qminimal.dll": "cd0ad6b1c10f0870d3313055768f5bb3be1024ed23db554832fdf036331e98f6",
+        "PyQt6/Qt6/plugins/platforms/qoffscreen.dll": "54b0bc9a4aa9b1e1406e359569a8f2858ab368255f1e53c71d1fc405c2dbd32b",
+        "PyQt6/Qt6/plugins/platforms/qwindows.dll": "12eef54bcdb6711b2722e9cef983d91a54546565a96b684d7bd9e2a7370fde92",
+        "PyQt6/Qt6/plugins/styles/qmodernwindowsstyle.dll": "db5ef23d50d53fa66920baea1240a17dd47c6a6037dc72ee0288b07a3396b2c9",
+        "PyQt6/Qt6/plugins/tls/qcertonlybackend.dll": "bf7f2550a0c689ede7b90d71a8d6371c6a01b01a8aba26f0b755f3933fb78fe4",
+        "PyQt6/Qt6/plugins/tls/qopensslbackend.dll": "febe901f9accf2d0cb4972ff9dd4e75bacc1406e8832d0b1694df9518050fe2b",
+        "PyQt6/Qt6/plugins/tls/qschannelbackend.dll": "f37162f9ff47bc552132314dbf1bf6d436edaee983ec67a9a175cb52e0c38045"
+      },
+      "notice_file": "windows-notices.txt",
+      "redistribution_basis": "Unmodified official PyQt6-Qt6 Windows wheel binaries matched by SHA-256; LGPLv3/GPLv3-compatible Qt module terms and upstream third-party notices retained with source archives.",
+      "sources": [
+        {
+          "component": "qtbase",
+          "version": "6.12.0",
+          "url": "https://download.qt.io/archive/qt/6.12/6.12.0/submodules/qtbase-everywhere-src-6.12.0.tar.xz",
+          "sha256": "a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307",
+          "file": "qtbase-6.12.0/qtbase-everywhere-src-6.12.0.tar.xz"
+        },
+        {
+          "component": "qtimageformats",
+          "version": "6.12.0",
+          "url": "https://download.qt.io/archive/qt/6.12/6.12.0/submodules/qtimageformats-everywhere-src-6.12.0.tar.xz",
+          "sha256": "0943132b5db8de6b6a7f1d162682173e8763c7ed94e80fd39113292845f67762",
+          "file": "qtimageformats-6.12.0/qtimageformats-everywhere-src-6.12.0.tar.xz"
+        },
+        {
+          "component": "qtsvg",
+          "version": "6.12.0",
+          "url": "https://download.qt.io/archive/qt/6.12/6.12.0/submodules/qtsvg-everywhere-src-6.12.0.tar.xz",
+          "sha256": "e4ab39534ec97987b1b9b60ef7f4d3253d5912a69f8c713a01753174a4029331",
+          "file": "qtsvg-6.12.0/qtsvg-everywhere-src-6.12.0.tar.xz"
+        },
+        {
+          "component": "qttranslations",
+          "version": "6.12.0",
+          "url": "https://download.qt.io/archive/qt/6.12/6.12.0/submodules/qttranslations-everywhere-src-6.12.0.tar.xz",
+          "sha256": "85929c0c30d6f273f23bd879bb69803ea17b010ab73cab2f8abf95357f6f6bbb",
+          "file": "qttranslations-6.12.0/qttranslations-everywhere-src-6.12.0.tar.xz"
+        }
+      ]
+    },
+    {
+      "component": "Mesa-LLVM software renderer",
+      "version": "Mesa 11.2.2 / LLVM 3.6.2",
+      "files": {
+        "PyQt6/Qt6/bin/opengl32sw.dll": "b04de4541863bc7d8879040a78889c4849c1b1da2784c4630f734c146c2998ce"
+      },
+      "notice_file": "windows-notices.txt",
+      "redistribution_basis": "Unmodified renderer matched to official PyQt6-Qt6 wheel. Binary version strings identify Mesa 11.2.2 and LLVM 3.6.2. MIT/BSD/UIUC notices and identified upstream sources retained. Supplier build guidance: https://wiki.qt.io/MesaLlvmpipe",
+      "sources": [
+        {
+          "component": "LLVM",
+          "version": "3.6.2",
+          "url": "https://releases.llvm.org/3.6.2/llvm-3.6.2.src.tar.xz",
+          "sha256": "f60dc158bfda6822de167e87275848969f0558b3134892ff54fced87e4667b94",
+          "file": "LLVM-3.6.2/llvm-3.6.2.src.tar.xz"
+        },
+        {
+          "component": "Mesa",
+          "version": "11.2.2",
+          "url": "https://archive.mesa3d.org/older-versions/11.x/11.2.2/mesa-11.2.2.tar.xz",
+          "sha256": "40e148812388ec7c6d7b6657d5a16e2e8dabba8b97ddfceea5197947647bdfb4",
+          "file": "Mesa-11.2.2/mesa-11.2.2.tar.xz"
+        }
+      ]
+    },
+    {
+      "component": "CPython",
+      "version": "3.13.3",
+      "files": {
+        "_bz2.pyd": "449058efc99fccb9e24d640084d845c78f3f86dd34c5c126cf69e523d6320d75",
+        "_ctypes.pyd": "5c0d5082fba1a2a3eb8d5e23073be25164c19f21304b09cecaab340dc7198815",
+        "_decimal.pyd": "4e27c06b84401039d10f800a0f06446b58508784ee366c7c8324d8fe9794e1a5",
+        "_hashlib.pyd": "52f29aebe9886e830dedc363cd64eb53b6830d84b26e14f1b6faa655a0900b5d",
+        "_lzma.pyd": "48f16b587c6faa44a9e073365b19599200b0f0a0ccb70121e76c2dac4ed53281",
+        "_socket.pyd": "bced17d6f081d81ea7cd92f1e071e38f8840e61ee0fe1524221b776bcfa78650",
+        "_wmi.pyd": "ebd252d21af9c84128fca04c994093a5bd6ee857f1581f06f4026fdd6a2c40e0",
+        "libcrypto-3.dll": "ccfffddcd3defb8d899026298af9af43bc186130f8483d77e97c93233d5f27d7",
+        "libffi-8.dll": "eff52743773eb550fcc6ce3efc37c85724502233b6b002a35496d828bd7b280a",
+        "python3.dll": "fdd54b6c495e9278e73d68203fff0c300e416e704852908cf5b06666cffead51",
+        "python313.dll": "69fd86ea29370697c203f7e12830084f920f490766a8e3045af52c036a9ad529",
+        "select.pyd": "6393121130a3e85d0f6562948024d8614c4c144b84ab102af711c638344d1599",
+        "unicodedata.pyd": "071494856fdad0042964769aa2fb1de4ea95c2cfcbe27cc7132293c68d13d710"
+      },
+      "notice_file": "windows-notices.txt",
+      "redistribution_basis": "Exact Python 3.13.3 amd64 embeddable-distribution binaries matched by SHA-256. PSF and incorporated-software notices retained. CPython source and immutable source-dependency revisions from its PCbuild recipe are supplied.",
+      "sources": [
+        {
+          "component": "CPython",
+          "version": "3.13.3",
+          "url": "https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tar.xz",
+          "sha256": "40f868bcbdeb8149a3149580bb9bfd407b3321cd48f0be631af955ac92c0e041",
+          "file": "CPython-3.13.3/Python-3.13.3.tar.xz"
+        },
+        {
+          "component": "CPython-bzip2",
+          "version": "1.0.8",
+          "url": "https://codeload.github.com/python/cpython-source-deps/tar.gz/05301997b2f9590f49c672cf3dfd3d3dfa7ad521",
+          "sha256": "ab14accac86cdd92021d50465deeb221b476d6675bd1383d3c7fb83751c2e0a3",
+          "file": "CPython-bzip2-1.0.8/05301997b2f9590f49c672cf3dfd3d3dfa7ad521"
+        },
+        {
+          "component": "CPython-libffi",
+          "version": "3.4.4",
+          "url": "https://codeload.github.com/python/cpython-source-deps/tar.gz/73b247f34ef3ae1859b8c2c34d321d34ebc5db15",
+          "sha256": "a9b2840c1b99a2b57746c50f1f2ab902420628111690ec420e7293ec1f502d7b",
+          "file": "CPython-libffi-3.4.4/73b247f34ef3ae1859b8c2c34d321d34ebc5db15"
+        },
+        {
+          "component": "CPython-mpdecimal",
+          "version": "4.0.0",
+          "url": "https://codeload.github.com/python/cpython-source-deps/tar.gz/48316ec025c1ebe500854c332be0a12c640c7301",
+          "sha256": "2db089d12f3467f7ec6cc964e821faa18fb662c467b2fa713e32a39c374441e3",
+          "file": "CPython-mpdecimal-4.0.0/48316ec025c1ebe500854c332be0a12c640c7301"
+        },
+        {
+          "component": "CPython-openssl",
+          "version": "3.0.16",
+          "url": "https://codeload.github.com/python/cpython-source-deps/tar.gz/bb01d0a37b909f6fe280b1c2015fa1f6005fb4e2",
+          "sha256": "76f18f21dbc7e0ba747de571f908a9ac16c0173d0c5c9c2816993e09e85dc5ff",
+          "file": "CPython-openssl-3.0.16/bb01d0a37b909f6fe280b1c2015fa1f6005fb4e2"
+        },
+        {
+          "component": "CPython-xz",
+          "version": "5.2.5",
+          "url": "https://codeload.github.com/python/cpython-source-deps/tar.gz/c6bc0c612605622aaef101a33a751f9de2ecc193",
+          "sha256": "115433c946ee069e857fd04cf41b38a4a74ed45d868a3b2e08ccd4a1f04f39d0",
+          "file": "CPython-xz-5.2.5/c6bc0c612605622aaef101a33a751f9de2ecc193"
+        },
+        {
+          "component": "CPython-zlib",
+          "version": "1.3.1",
+          "url": "https://codeload.github.com/python/cpython-source-deps/tar.gz/4dc98e1909830e2bdc2a9cc2236e3c5d5037335b",
+          "sha256": "1fe30e919eb560f495de9ee4bd7ba5216ce13f454affb4ccc32e15efa3878f5e",
+          "file": "CPython-zlib-1.3.1/4dc98e1909830e2bdc2a9cc2236e3c5d5037335b"
+        }
+      ]
+    },
+    {
+      "component": "Microsoft runtime (Qt distribution)",
+      "version": "14.44.35211.0",
+      "files": {
+        "PyQt6/Qt6/bin/MSVCP140.dll": "0f885b509a685d2bbfa652fed26b5fb31d88fbdab0a978c641d1c7b8aa460aa9",
+        "PyQt6/Qt6/bin/MSVCP140_1.dll": "bfad5aef4c63a669e3c140655cdfdf395b6c979b400a447bd5dcb65ed8826c3d",
+        "PyQt6/Qt6/bin/MSVCP140_2.dll": "3ea06f0ee098b4823cb79599df3780e7f23cce52c19aac31d2a0d47efe33a5e9",
+        "PyQt6/Qt6/bin/VCRUNTIME140.dll": "d5e4d9a3e835fa679450145d6a7d94e36573a509317111904d9b3712c30d9066",
+        "PyQt6/Qt6/bin/VCRUNTIME140_1.dll": "1f2d41c4aa5db0bc33ebf7b66d72943a817d7ce6cbe880502a9403823633093f"
+      },
+      "notice_file": "windows-notices.txt",
+      "redistribution_basis": "Unmodified Microsoft runtime DLLs supplied with the official Qt/Python Windows distributions, matched by SHA-256. Distributed as dependencies of a functional Windows application; retained Microsoft and Python Windows conditions. They are separately licensed, not part of ModemDiag's MIT/GPL grant. Distributor reference: https://visualstudio.microsoft.com/license-terms/vs2022-ga-community/",
+      "source_exception": "Proprietary compiler/system runtime libraries, provided in object-code form under Microsoft redistribution terms; source is not available or required under the runtime license. Retain notices and Windows platform, copyright and non-endorsement conditions."
+    },
+    {
+      "component": "Microsoft runtime (Python distribution)",
+      "version": "14.42.34438.0",
+      "files": {
+        "VCRUNTIME140.dll": "052ad6a20d375957e82aa6a3c441ea548d89be0981516ca7eb306e063d5027f4",
+        "VCRUNTIME140_1.dll": "6a99bc0128e0c7d6cbbf615fcc26909565e17d4ca3451b97f8987f9c6acbc6c8"
+      },
+      "notice_file": "windows-notices.txt",
+      "redistribution_basis": "Unmodified Microsoft runtime DLLs supplied with the official Qt/Python Windows distributions, matched by SHA-256. Distributed as dependencies of a functional Windows application; retained Microsoft and Python Windows conditions. They are separately licensed, not part of ModemDiag's MIT/GPL grant. Distributor reference: https://visualstudio.microsoft.com/license-terms/vs2022-ga-community/",
+      "source_exception": "Proprietary compiler/system runtime libraries, provided in object-code form under Microsoft redistribution terms; source is not available or required under the runtime license. Retain notices and Windows platform, copyright and non-endorsement conditions."
+    },
+    {
+      "component": "MSYS2 OpenSSL",
+      "version": "3.1.0-1",
+      "files": {
+        "libcrypto-3-x64.dll": "c779c56ed1a67711518bd6216e0966bc0ec1ab8d7a236645d5861d9d55bb6278",
+        "libssl-3-x64.dll": "9fb8d9d6770af359d6ad3e9eea4313206183a8679eb4abe75d44ba8386b643c2"
+      },
+      "notice_file": "windows-notices.txt",
+      "redistribution_basis": "DLL origin confirmed as MSYS2 ucrt64; OpenSSL 3.1.0 and PE build date 2023-03-15 match package recipe revision 6fc2a827f36b462463ea5e0e567d31ae7f815a98. Apache-2.0 OpenSSL notice and CC0 path-tools notice retained. Upstream archive, recipe, patches and path-tools files are supplied.",
+      "sources": [
+        {
+          "component": "MSYS2-openssl",
+          "version": "3.1.0",
+          "url": "https://github.com/openssl/openssl/releases/download/openssl-3.1.0/openssl-3.1.0.tar.gz",
+          "sha256": "aaa925ad9828745c4cad9d9efeb273deca820f2cdcf2c3ac7d7c1212b7c497b4",
+          "file": "MSYS2-openssl-3.1.0/openssl-3.1.0.tar.gz"
+        },
+        {
+          "component": "MSYS2-openssl-build",
+          "version": "3.1.0-1",
+          "url": "https://raw.githubusercontent.com/msys2/MINGW-packages/6fc2a827f36b462463ea5e0e567d31ae7f815a98/mingw-w64-openssl/001-support-aarch64.patch",
+          "sha256": "21b96771b401442570e885c2d5689a359a91e86dcbf5511db3667202b6c1fa8a",
+          "file": "MSYS2-openssl-build-3.1.0-1/001-support-aarch64.patch"
+        },
+        {
+          "component": "MSYS2-openssl-build",
+          "version": "3.1.0-1",
+          "url": "https://raw.githubusercontent.com/msys2/MINGW-packages/6fc2a827f36b462463ea5e0e567d31ae7f815a98/mingw-w64-openssl/002-relocation.patch",
+          "sha256": "5628dd39ab0d3ce4afbb5207bab5d22766abc86a8875b48b6d4d3efd68550e68",
+          "file": "MSYS2-openssl-build-3.1.0-1/002-relocation.patch"
+        },
+        {
+          "component": "MSYS2-openssl-build",
+          "version": "3.1.0-1",
+          "url": "https://raw.githubusercontent.com/msys2/MINGW-packages/6fc2a827f36b462463ea5e0e567d31ae7f815a98/mingw-w64-openssl/PKGBUILD",
+          "sha256": "5d403687dad48f2d1732366ea462f85493632439f14c006bae500543ca04d396",
+          "file": "MSYS2-openssl-build-3.1.0-1/PKGBUILD"
+        },
+        {
+          "component": "MSYS2-openssl-build",
+          "version": "3.1.0-1",
+          "url": "https://raw.githubusercontent.com/msys2/MINGW-packages/6fc2a827f36b462463ea5e0e567d31ae7f815a98/mingw-w64-openssl/pathtools.c",
+          "sha256": "08209cbf1633fa92eae7e5d28f95f8df9d6184cc20fa878c99aec4709bb257fd",
+          "file": "MSYS2-openssl-build-3.1.0-1/pathtools.c"
+        },
+        {
+          "component": "MSYS2-openssl-build",
+          "version": "3.1.0-1",
+          "url": "https://raw.githubusercontent.com/msys2/MINGW-packages/6fc2a827f36b462463ea5e0e567d31ae7f815a98/mingw-w64-openssl/pathtools.h",
+          "sha256": "965d3921ec4fdeec94a2718bc2c85ce5e1a00ea0e499330a554074a7ae15dfc6",
+          "file": "MSYS2-openssl-build-3.1.0-1/pathtools.h"
+        }
+      ]
+    }
+  ]
+}

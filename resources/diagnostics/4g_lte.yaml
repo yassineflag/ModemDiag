@@ -1,0 +1,96 @@
+name: "4G LTE"
+description: "Check LTE registration, signal quality, and data session"
+icon: "📶"
+steps:
+  - command: "ATI"
+    description: "Module identification"
+    expect: "OK"
+    timeout_ms: 3000
+    delay_ms: 300
+
+  - command: "AT+CPIN?"
+    description: "SIM card status"
+    expect: "+CPIN"
+    expect_regex: '^\+CPIN:\s*READY\s*$'
+    timeout_ms: 3000
+    delay_ms: 300
+
+  - command: "AT+COPS?"
+    description: "Current operator"
+    expect: "+COPS"
+    timeout_ms: 5000
+    delay_ms: 500
+
+  - command: "AT+CEREG?"
+    description: "Read LTE EPS registration status"
+    expect: "+CEREG"
+    expect_regex: '^\+CEREG:\s*\d+\s*,\s*(?:1|5)(?:\s*,.*)?$'
+    timeout_ms: 5000
+    delay_ms: 500
+
+  - command: "AT+CSQ"
+    description: "Signal quality (RSSI + BER)"
+    expect: "+CSQ"
+    timeout_ms: 3000
+    delay_ms: 300
+
+  - command: "AT+CESQ"
+    description: "Read extended signal measurements supported by the modem"
+    expect: "+CESQ"
+    timeout_ms: 3000
+    delay_ms: 300
+
+  - command: "AT+CGDCONT?"
+    description: "PDP context configuration"
+    expect: "+CGDCONT"
+    timeout_ms: 3000
+    delay_ms: 300
+
+  - command: "AT+CGATT?"
+    description: "PS attach status"
+    expect: "+CGATT"
+    expect_regex: '^\+CGATT:\s*1\s*$'
+    timeout_ms: 5000
+    delay_ms: 300
+
+  - command: "AT+CGPADDR=1"
+    description: "IP address for PDP context 1"
+    expect: "+CGPADDR"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
+
+  # ── Quectel ───────────────────────────────────────────────────────────────────
+  - command: 'AT+QENG="servingcell"'
+    description: "LTE serving cell — band, EARFCN, RSRP"
+    manufacturer: "Quectel"
+    expect: "+QENG"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
+
+  - command: "AT+QNWINFO"
+    description: "Network access type and band"
+    manufacturer: "Quectel"
+    expect: "+QNWINFO"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
+
+  # ── Sierra Wireless ───────────────────────────────────────────────────────────
+  - command: "AT!GSTATUS?"
+    description: "General radio status"
+    manufacturer: "Sierra Wireless"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
+
+  # ── Telit ─────────────────────────────────────────────────────────────────────
+  - command: "AT#MONI"
+    description: "Serving cell monitoring (RSSI, quality)"
+    manufacturer: "Telit"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue

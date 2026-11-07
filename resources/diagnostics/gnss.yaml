@@ -1,0 +1,125 @@
+name: "GNSS / GPS"
+description: "Select a vendor to start GNSS and read navigation data; a position fix requires satellite reception"
+icon: "🛰️"
+steps:
+  - command: "AT+CFUN?"
+    description: "Check module functionality"
+    expect: "+CFUN"
+    timeout_ms: 3000
+    delay_ms: 300
+
+  # ── Quectel ──────────────────────────────────────────────────────────────────
+  - command: "AT+QGPS=1"
+    description: "Enable GNSS engine"
+    manufacturer: "Quectel"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 2000
+    on_failure: continue
+
+  - command: "AT+QGPS?"
+    description: "GNSS engine status"
+    manufacturer: "Quectel"
+    expect: "+QGPS"
+    timeout_ms: 3000
+    delay_ms: 500
+    on_failure: continue
+
+  - command: "AT+QGPSLOC=2"
+    description: "Get GPS fix (lat/lon/HDOP/alt) — may take up to 60s outdoors"
+    manufacturer: "Quectel"
+    expect: "+QGPSLOC"
+    timeout_ms: 30000
+    delay_ms: 500
+    on_failure: continue
+
+  # ── Fibocom ───────────────────────────────────────────────────────────────────
+  - command: "AT+GTGPSPOWER=1"
+    description: "Enable GNSS on supported Fibocom modules"
+    manufacturer: "Fibocom"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 2000
+    on_failure: continue
+
+  - command: "AT+GTGPS?"
+    description: "Read Fibocom navigation data; a valid fix may be unavailable"
+    manufacturer: "Fibocom"
+    expect: "OK"
+    timeout_ms: 15000
+    delay_ms: 500
+    on_failure: continue
+
+  # ── Sierra Wireless ───────────────────────────────────────────────────────────
+  - command: "AT!GPSTRACK=1,60,100,1,1"
+    description: "Request one standalone fix (WP families)"
+    manufacturer: "Sierra Wireless"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 2000
+    on_failure: continue
+
+  - command: "AT!GPSLOC?"
+    description: "Read last known location; a new fix may still be pending"
+    manufacturer: "Sierra Wireless"
+    expect: "OK"
+    timeout_ms: 15000
+    delay_ms: 500
+    on_failure: continue
+
+  # ── u-blox ────────────────────────────────────────────────────────────────────
+  - command: "AT+UGPS=1,0"
+    description: "Enable supported u-blox GNSS receiver without aiding"
+    manufacturer: "u-blox"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 2000
+    on_failure: continue
+
+  - command: "AT+UGGLL=1"
+    description: "Enable storage of GLL navigation messages (SARA-R5)"
+    manufacturer: "u-blox"
+    expect: "OK"
+    timeout_ms: 3000
+    delay_ms: 1000
+    on_failure: continue
+
+  - command: "AT+UGGLL?"
+    description: "Read stored GLL navigation message (SARA-R5)"
+    manufacturer: "u-blox"
+    expect: "OK"
+    timeout_ms: 15000
+    delay_ms: 500
+    on_failure: continue
+
+  - command: "AT+CGPS=1"
+    description: "Start GPS (SIM7500/SIM7600 family)"
+    manufacturer: "SIMCom SIM7500/SIM7600"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 2000
+    on_failure: continue
+
+  - command: "AT+CGPSINFO"
+    description: "Read GPS position (SIM7500/SIM7600 family)"
+    manufacturer: "SIMCom SIM7500/SIM7600"
+    expect: "+CGPSINFO:"
+    timeout_ms: 10000
+    delay_ms: 500
+    on_failure: continue
+
+  - command: "AT+CGPSPWR=1"
+    description: "Power GPS receiver (SIM808 family)"
+    manufacturer: "SIMCom SIM808"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 2000
+    on_failure: continue
+
+  - command: "AT+CGPSINF=0"
+    description: "Read GPS position (SIM808 family)"
+    manufacturer: "SIMCom SIM808"
+    expect: "+CGPSINF:"
+    timeout_ms: 10000
+    delay_ms: 500
+    on_failure: continue

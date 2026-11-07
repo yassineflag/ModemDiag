@@ -1,0 +1,953 @@
+manufacturer: "Quectel"
+profiles:
+  ec2x: EC2x / EG9x / EM05
+  bg96: BG96
+  bg95: BG95 / BG77 / BG600L
+color: "#1a9e4a"
+
+# ── Category → UI tab mapping ─────────────────────────────────────────────────
+# "Status & Info"  → Identity tab
+# "SIM Info"       → SIM tab
+# "Network Info"   → Network tab
+# "Band & RAT"     → Network tab
+# "TCP/IP Stack"   → TCP/IP tab  (NEW)
+# "HTTP"           → IoT/Cloud tab
+# "MQTT"           → IoT/Cloud tab
+# "FTP"            → IoT/Cloud tab
+# "SSL/TLS"        → IoT/Cloud tab
+# "GNSS"           → GNSS tab
+# "Configuration"  → Config tab
+# "Firmware / Misc"→ Config tab
+# "URC/Status"     → Config tab
+# "Power"          → Power tab
+# "Audio"          → Other tab
+
+categories:
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # IDENTITY TAB
+  # ─────────────────────────────────────────────────────────────────────────────
+  - name: "Status & Info"
+    commands:
+      - name: "AT+QGMR"
+        command: "AT+QGMR"
+        profiles: [ec2x, bg96, bg95]
+        description: "Detailed firmware version string"
+      - name: Product serial number
+        command: AT+CGSN=0
+        description: Read product serial number (EC2x family); this is not the IMEI selector
+
+      - name: "AT+QGDCNT?"
+        command: "AT+QGDCNT?"
+        description: "Query packet data byte counters (TX/RX)"
+      - name: "AT+QAUGDCNT?"
+        command: "AT+QAUGDCNT?"
+        description: "Auto-save packet data counter status"
+      - name: "AT+QNETDEVSTATUS?"
+        command: "AT+QNETDEVSTATUS?"
+        description: "Query RmNet device (NDIS/ECM/MBIM) status"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # SIM TAB
+  # ─────────────────────────────────────────────────────────────────────────────
+  - name: "SIM Info"
+    commands:
+      - name: "AT+QCCID"
+        command: "AT+QCCID"
+        profiles: [ec2x, bg96, bg95]
+        description: "ICCID from SIM (Quectel extended version)"
+      - name: AT+QPINC SC
+        command: AT+QPINC="SC"
+        description: Read remaining SIM PIN and PUK attempts for the SC facility
+
+      - name: "AT+QINISTAT"
+        command: "AT+QINISTAT"
+        description: "SIM card initialization status"
+      - name: "AT+QSIMDET?"
+        command: "AT+QSIMDET?"
+        description: "Query SIM hot-swap detection config"
+      - name: "AT+QSIMSTAT?"
+        command: "AT+QSIMSTAT?"
+        description: "Query SIM insertion status URC setting"
+      - name: "AT+QSIMVOL?"
+        command: "AT+QSIMVOL?"
+        description: "Query fixed SIM card supply voltage setting"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # NETWORK TAB
+  # ─────────────────────────────────────────────────────────────────────────────
+  - name: "Network Info"
+    commands:
+      - name: "AT+QNWINFO"
+        command: "AT+QNWINFO"
+        profiles: [ec2x, bg96, bg95]
+        description: "Network access tech, operator, band, channel"
+      - name: "AT+QENG=\"servingcell\""
+        command: "AT+QENG=\"servingcell\""
+        profiles: [ec2x, bg96, bg95]
+        description: "Serving cell: MCC/MNC/PCI/RSRP/SINR/band"
+      - name: "AT+QENG=\"neighbourcell\""
+        command: "AT+QENG=\"neighbourcell\""
+        profiles: [ec2x, bg96, bg95]
+        description: "Neighbouring cell measurement report"
+      - name: "AT+QCAINFO"
+        command: "AT+QCAINFO"
+        description: "Carrier aggregation info (LTE-CA / 5G EN-DC)"
+      - name: "AT+QCSQ"
+        command: "AT+QCSQ"
+        profiles: [ec2x, bg96, bg95]
+        description: "Extended signal: RSSI, RSRP, SINR, RSRQ"
+      - name: "AT+QSPN"
+        command: "AT+QSPN"
+        description: "Registered network name (short + long + PLMN)"
+      - name: AT+QNETINFO
+        command: AT+QNETINFO={rat},{mask}
+        description: Read RAT metrics (EC2x family); this does not select an NR cell
+        caps: AT+QNETINFO=?
+        params:
+        - id: rat
+          label: RAT
+          type: select
+          options:
+          - 0=GSM
+          - 1=WCDMA
+          - 2=LTE
+          default: 2=LTE
+        - id: mask
+          label: Metric mask (hex)
+          default: '1'
+          hint: 'LTE: bit 0=SINR, bit 1=timing advance, bit 2=DRX'
+
+      - name: "AT+QLTS=1"
+        command: "AT+QLTS=1"
+        description: "Latest timestamp synchronized from network"
+      - name: "AT+QOPS=?"
+        command: "AT+QOPS=?"
+        description: "Band scan — query syntax"
+      - name: "AT+QFPLMNCFG?"
+        command: "AT+QFPLMNCFG?"
+        description: "Query forbidden PLMN list configuration"
+      - name: "AT+QNWLOCK?"
+        command: "AT+QNWLOCK=\"common/lte\""
+        description: "Query cell/frequency network lock settings"
+
+  - name: "Band & RAT"
+    commands:
+      - name: AT+QCFG nwscanmode
+        command: AT+QCFG="nwscanmode",{mode},1
+        get: AT+QCFG="nwscanmode"
+        caps: AT+QCFG=?
+        description: Set network search mode (EC2x family); this is not the 5G RAT selection interface
+        params:
+        - id: mode
+          label: Scan mode
+          type: select
+          options:
+          - 0=Auto
+          - 1=GSM only
+          - 2=WCDMA only
+          - 3=LTE only
+          default: 0=Auto
+
+      - name: AT+QCFG nwscanseq
+        command: AT+QCFG="nwscanseq",{seq}
+        get: AT+QCFG="nwscanseq"
+        description: Set network search order (EC25/EC21); saved setting applies after restart
+        params:
+        - id: seq
+          label: Scan sequence
+          type: select
+          options:
+          - 00=Automatic
+          - 04030201=LTE/WCDMA/TD-SCDMA/GSM
+          - 040301=LTE/WCDMA/GSM
+          default: 00=Automatic
+
+      - name: AT+QCFG band
+        command: AT+QCFG="band",{bandval},{ltebandmask},{tdsbandval},1
+        get: AT+QCFG="band"
+        description: Set legacy/LTE/TD-SCDMA band masks (EC2x family); the third mask is not NR
+        params:
+        - id: bandval
+          label: GSM/WCDMA mask (hex)
+          default: '0'
+          hint: 0 keeps the current selection; use the module band table
+        - id: ltebandmask
+          label: LTE bands (hex bitmask)
+          default: '0'
+          hint: 0 keeps the current LTE bands; use module-specific supported bands
+        - id: tdsbandval
+          label: TD-SCDMA mask (hex)
+          default: '0'
+          hint: 0 keeps the current selection; not a 5G NR band mask
+
+      - name: AT+QCFG iotopmode
+        command: AT+QCFG="iotopmode",{mode},1
+        profiles: [bg96]
+        get: AT+QCFG="iotopmode"
+        description: Select LTE-M/NB-IoT search on BG96 (not BG96-M); not an EC2x setting
+        params:
+        - id: mode
+          label: IoT mode
+          type: select
+          options:
+          - 0=LTE-M
+          - 1=NB-IoT
+          - 2=LTE-M and NB-IoT
+          default: 0=LTE-M
+
+      - name: "AT+QCFG servicedomain"
+        command: "AT+QCFG=\"servicedomain\",{domain},1"
+        get: "AT+QCFG=\"servicedomain\""
+        description: "Service domain — CS / PS / CS+PS"
+        params:
+          - id: domain
+            label: "Domain"
+            type: select
+            options: ["0=CS only", "1=PS only", "2=CS+PS"]
+            default: "1=PS only"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # TCP/IP TAB  (NEW)
+  # ─────────────────────────────────────────────────────────────────────────────
+  - name: "TCP/IP Stack"
+    commands:
+      - name: "AT+QICSGP=1"
+        command: "AT+QICSGP=1,1,\"{apn}\",\"{user}\",\"{pass}\",{auth}"
+        profiles: [ec2x]
+        description: "Configure TCP/IP APN for context 1"
+        params:
+          - id: apn
+            label: "APN"
+            default: "internet"
+            hint: "e.g. fast.t-mobile.com, m2m.telstra.com"
+          - id: user
+            label: "Username"
+            default: ""
+            hint: "Leave blank if not required"
+          - id: pass
+            label: "Password"
+            default: ""
+            hint: "Leave blank if not required"
+          - id: auth
+            label: "Auth type"
+            type: select
+            options: ["0=None", "1=PAP", "2=CHAP", "3=PAP+CHAP"]
+            default: "0=None"
+      - name: "AT+QICSGP?"
+        command: "AT+QICSGP=1"
+        profiles: [ec2x]
+        description: "Query TCP/IP APN configuration for context 1"
+      - name: "AT+QIACT=1"
+        command: "AT+QIACT=1"
+        profiles: [ec2x]
+        description: "Activate TCP/IP context 1"
+      - name: "AT+QIACT?"
+        command: "AT+QIACT?"
+        profiles: [ec2x]
+        description: "Query TCP/IP context activation state"
+      - name: "AT+QIDEACT=1"
+        command: "AT+QIDEACT=1"
+        profiles: [ec2x]
+        description: "Deactivate TCP/IP context 1"
+      - name: "AT+QIOPEN"
+        command: "AT+QIOPEN=1,0,\"{proto}\",\"{host}\",{port},0,1"
+        profiles: [ec2x]
+        description: "Open TCP/UDP socket"
+        params:
+          - id: proto
+            label: "Protocol"
+            type: select
+            options: ["TCP", "UDP", "TCP LISTENER", "UDP LISTENER"]
+            default: "TCP"
+          - id: host
+            label: "Host / IP"
+            default: "example.com"
+            hint: "IP address or hostname"
+          - id: port
+            label: "Port"
+            default: "1883"
+            hint: "e.g. 80, 443, 1883, 8883"
+      - name: "AT+QICLOSE=0"
+        command: "AT+QICLOSE=0"
+        profiles: [ec2x]
+        description: "Close socket connection 0"
+      - name: "AT+QISTATE"
+        command: "AT+QISTATE"
+        profiles: [ec2x]
+        description: "Query status of all open sockets"
+      - name: AT+QISEND
+        command: AT+QISEND=0,{len}
+        profiles: [ec2x]
+        description: Start a fixed-length send on socket 0; raw payload bytes are required after the prompt
+        params:
+        - id: len
+          label: Byte length
+          default: '0'
+          hint: Number of bytes to send
+
+      - name: "AT+QIRD"
+        command: "AT+QIRD=0,{len}"
+        profiles: [ec2x]
+        description: "Read up to {len} bytes from socket 0"
+        params:
+          - id: len
+            label: "Max bytes"
+            default: "1460"
+      - name: AT+QPING
+        command: AT+QPING=1,"{host}",{timeout},{count}
+        profiles: [ec2x]
+        description: Ping through active context 1; results arrive asynchronously after command acceptance
+        params:
+        - id: host
+          label: Host / IP
+          default: 8.8.8.8
+        - id: timeout
+          label: Reply timeout (seconds)
+          default: '4'
+          hint: 1-255 seconds per request
+        - id: count
+          label: Ping count
+          default: '4'
+
+      - name: "AT+QNTP"
+        command: "AT+QNTP=1,\"{server}\""
+        description: "Sync time from NTP server"
+        params:
+          - id: server
+            label: "NTP server"
+            default: "pool.ntp.org"
+            hint: "e.g. time.google.com"
+      - name: "AT+QIDNSCFG"
+        command: "AT+QIDNSCFG=1,\"{dns1}\",\"{dns2}\""
+        description: "Set DNS servers for context 1"
+        params:
+          - id: dns1
+            label: "Primary DNS"
+            default: "8.8.8.8"
+          - id: dns2
+            label: "Secondary DNS"
+            default: "8.8.4.4"
+      - name: "AT+QIDNSGIP"
+        command: "AT+QIDNSGIP=1,\"{host}\""
+        description: "DNS lookup for hostname"
+        params:
+          - id: host
+            label: "Hostname"
+            default: "example.com"
+      - name: "AT+QIGETERROR"
+        command: "AT+QIGETERROR"
+        profiles: [ec2x]
+        description: "Get last TCP/IP error code"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # IoT/Cloud TAB
+  # ─────────────────────────────────────────────────────────────────────────────
+  - name: "HTTP"
+    commands:
+      - name: "AT+QHTTPCFG Context"
+        command: "AT+QHTTPCFG=\"contextid\",1"
+        profiles: [ec2x]
+        description: "Bind HTTP to PDP/TCP context 1"
+      - name: "AT+QHTTPCFG SSL"
+        command: "AT+QHTTPCFG=\"sslctxid\",1"
+        profiles: [ec2x]
+        description: "Bind HTTP to SSL context 1 (for HTTPS)"
+      - name: "AT+QHTTPCFG Hdrs"
+        command: "AT+QHTTPCFG=\"responseheader\",1"
+        profiles: [ec2x]
+        description: "Include HTTP response headers in output"
+      - name: "AT+QHTTPCFG=?"
+        command: "AT+QHTTPCFG=?"
+        profiles: [ec2x]
+        description: "List all HTTP configuration parameters"
+      - name: AT+QHTTPURL
+        command: AT+QHTTPURL={len},80
+        profiles: [ec2x]
+        description: Start URL input; exactly the specified number of raw URL bytes must follow
+        params:
+        - id: len
+          label: URL length (bytes)
+          default: '40'
+          hint: Length of URL string you will type
+
+      - name: "AT+QHTTPGET"
+        command: "AT+QHTTPGET={timeout}"
+        profiles: [ec2x]
+        description: "Send HTTP GET request"
+        params:
+          - id: timeout
+            label: "Timeout (s)"
+            default: "80"
+      - name: AT+QHTTPPOST
+        command: AT+QHTTPPOST={dlen},{timeout},80
+        profiles: [ec2x]
+        description: Start HTTP body input; raw payload bytes must follow, then check the asynchronous result
+        params:
+        - id: dlen
+          label: Data length (bytes)
+          default: '20'
+        - id: timeout
+          label: Input timeout (s)
+          default: '80'
+
+      - name: "AT+QHTTPREAD"
+        command: "AT+QHTTPREAD={timeout}"
+        profiles: [ec2x]
+        description: "Read HTTP response body"
+        params:
+          - id: timeout
+            label: "Timeout (s)"
+            default: "80"
+      - name: "AT+QHTTPSTOP"
+        command: "AT+QHTTPSTOP"
+        profiles: [ec2x]
+        description: "Stop current HTTP session"
+
+  - name: "MQTT"
+    commands:
+      - name: "AT+QMTCFG Version"
+        command: "AT+QMTCFG=\"version\",0,{ver}"
+        profiles: [ec2x]
+        description: "Set MQTT protocol version"
+        params:
+          - id: ver
+            label: "MQTT version"
+            type: select
+            options: ["3=MQTT 3.1", "4=MQTT 3.1.1"]
+            default: "4=MQTT 3.1.1"
+      - name: "AT+QMTCFG SSL"
+        command: "AT+QMTCFG=\"ssl\",0,{en},{ssl_ctx}"
+        profiles: [ec2x]
+        description: "Enable/disable TLS for MQTT client 0"
+        params:
+          - id: en
+            label: "Enable SSL"
+            type: select
+            options: ["0=Disabled", "1=Enabled"]
+            default: "1=Enabled"
+          - id: ssl_ctx
+            label: "SSL context ID"
+            default: "0"
+      - name: "AT+QMTCFG Keepalive"
+        command: "AT+QMTCFG=\"keepalive\",0,{ka}"
+        profiles: [ec2x]
+        description: "Set MQTT keepalive interval"
+        params:
+          - id: ka
+            label: "Keepalive (s)"
+            default: "60"
+      - name: "AT+QMTOPEN"
+        command: "AT+QMTOPEN=0,\"{host}\",{port}"
+        profiles: [ec2x]
+        description: "Open MQTT connection (client 0)"
+        params:
+          - id: host
+            label: "Broker host"
+            default: "broker.hivemq.com"
+            hint: "IP or hostname of MQTT broker"
+          - id: port
+            label: "Port"
+            default: "1883"
+            hint: "1883=plain, 8883=TLS"
+      - name: "AT+QMTOPEN?"
+        command: "AT+QMTOPEN?"
+        profiles: [ec2x]
+        description: "Query MQTT connection status"
+      - name: "AT+QMTCONN"
+        command: "AT+QMTCONN=0,\"{client_id}\",\"{user}\",\"{pass}\""
+        profiles: [ec2x]
+        description: "Connect to MQTT broker"
+        params:
+          - id: client_id
+            label: "Client ID"
+            default: "modemdiag_client"
+            hint: "Unique client identifier"
+          - id: user
+            label: "Username"
+            default: ""
+            hint: "Leave blank if not required"
+          - id: pass
+            label: "Password"
+            default: ""
+      - name: AT+QMTPUB
+        command: AT+QMTPUB=0,0,0,0,"{topic}"
+        profiles: [ec2x]
+        description: Start MQTT publish input; raw payload and Ctrl-Z are required, then check the result
+        params:
+        - id: topic
+          label: Topic
+          default: modemdiag/test
+          hint: e.g. sensors/temperature
+
+      - name: "AT+QMTSUB"
+        command: "AT+QMTSUB=0,1,\"{topic}\",{qos}"
+        profiles: [ec2x]
+        description: "Subscribe to MQTT topic"
+        params:
+          - id: topic
+            label: "Topic"
+            default: "modemdiag/cmd"
+          - id: qos
+            label: "QoS"
+            type: select
+            options: ["0=At most once", "1=At least once", "2=Exactly once"]
+            default: "0=At most once"
+      - name: "AT+QMTDISC=0"
+        command: "AT+QMTDISC=0"
+        profiles: [ec2x]
+        description: "Disconnect from MQTT broker (client 0)"
+      - name: "AT+QMTCLOSE=0"
+        command: "AT+QMTCLOSE=0"
+        profiles: [ec2x]
+        description: "Close MQTT connection (client 0)"
+
+  - name: "SSL/TLS"
+    commands:
+      - name: "AT+QSSLCFG Version"
+        command: "AT+QSSLCFG=\"sslversion\",0,{ver}"
+        profiles: [ec2x]
+        description: "Set SSL/TLS version for context 0"
+        params:
+          - id: ver
+            label: "TLS version"
+            type: select
+            options: ["0=SSL3.0", "1=TLS1.0", "2=TLS1.1", "3=TLS1.2", "4=All"]
+            default: "4=All"
+      - name: AT+QSSLCFG SecLevel
+        command: AT+QSSLCFG="seclevel",0,{level}
+        profiles: [ec2x]
+        description: Configure peer/client certificate verification for TLS context 0
+        params:
+        - id: level
+          label: Security level
+          type: select
+          options:
+          - 0=No cert
+          - 1=Server cert
+          - 2=Mutual auth
+          default: 0=No cert
+
+      - name: AT+QSSLCFG Ignore Time
+        command: AT+QSSLCFG="ignorelocaltime",0,1
+        profiles: [ec2x]
+        description: Disable TLS certificate date checks; other configured certificate checks still apply
+
+      - name: "AT+QSSLCFG CA cert"
+        command: "AT+QSSLCFG=\"cacert\",0,\"{path}\""
+        profiles: [ec2x]
+        description: "Set CA certificate file path"
+        params:
+          - id: path
+            label: "CA cert file (UFS)"
+            default: "cacert.pem"
+            hint: "Must be uploaded to UFS first"
+      - name: "AT+QSSLCFG Client cert"
+        command: "AT+QSSLCFG=\"clientcert\",0,\"{path}\""
+        profiles: [ec2x]
+        description: "Set client certificate file path"
+        params:
+          - id: path
+            label: "Client cert file (UFS)"
+            default: "client.pem"
+      - name: "AT+QSSLCFG Client key"
+        command: "AT+QSSLCFG=\"clientkey\",0,\"{path}\""
+        profiles: [ec2x]
+        description: "Set client private key file path"
+        params:
+          - id: path
+            label: "Client key file (UFS)"
+            default: "client.key"
+      - name: "AT+QSSLOPEN"
+        command: "AT+QSSLOPEN=0,0,0,\"{host}\",{port},0"
+        description: "Open SSL/TLS connection"
+        params:
+          - id: host
+            label: "Host / IP"
+            default: "example.com"
+          - id: port
+            label: "Port"
+            default: "8883"
+            hint: "8883=MQTT/TLS, 443=HTTPS"
+      - name: "AT+QSSLCLOSE=0"
+        command: "AT+QSSLCLOSE=0"
+        description: "Close SSL connection 0"
+      - name: "AT+QSSLSTATE=0"
+        command: "AT+QSSLSTATE=0"
+        description: "Query SSL connection 0 state"
+      - name: AT+QSSLSEND
+        command: AT+QSSLSEND=0,{len}
+        description: Start TLS payload input; the specified number of raw payload bytes must follow
+        params:
+        - id: len
+          label: Byte length
+          default: '20'
+
+      - name: "AT+QSSLRECV"
+        command: "AT+QSSLRECV=0,{len}"
+        description: "Read data from SSL connection 0"
+        params:
+          - id: len
+            label: "Max bytes"
+            default: "1460"
+
+  - name: "FTP"
+    commands:
+      - name: "AT+QFTPCFG Context"
+        command: "AT+QFTPCFG=\"contextid\",1"
+        description: "Bind FTP client to PDP context 1"
+      - name: "AT+QFTPCFG Account"
+        command: "AT+QFTPCFG=\"account\",\"{user}\",\"{pass}\""
+        description: "Set FTP login credentials"
+        params:
+          - id: user
+            label: "FTP username"
+            default: "anonymous"
+          - id: pass
+            label: "FTP password"
+            default: ""
+      - name: "AT+QFTPOPEN"
+        command: "AT+QFTPOPEN=\"{host}\",{port}"
+        description: "Connect to FTP server"
+        params:
+          - id: host
+            label: "FTP host"
+            default: "ftp.example.com"
+          - id: port
+            label: "Port"
+            default: "21"
+      - name: "AT+QFTPCLOSE"
+        command: "AT+QFTPCLOSE"
+        description: "Close FTP session"
+      - name: "AT+QFTPLIST"
+        command: "AT+QFTPLIST=\"{path}\""
+        description: "List files in FTP directory"
+        params:
+          - id: path
+            label: "Remote path"
+            default: "/"
+      - name: "AT+QFTPGET"
+        command: "AT+QFTPGET=\"{remote}\",\"RAM:{local}\""
+        description: "Download file from FTP server"
+        params:
+          - id: remote
+            label: "Remote file path"
+            default: "/firmware.bin"
+          - id: local
+            label: "Local filename (UFS)"
+            default: "firmware.bin"
+      - name: "AT+QFTPPUT"
+        command: "AT+QFTPPUT=\"{remote}\",\"RAM:{local}\",0"
+        description: "Upload file to FTP server"
+        params:
+          - id: remote
+            label: "Remote file path"
+            default: "/upload/data.txt"
+          - id: local
+            label: "Local filename (UFS)"
+            default: "data.txt"
+      - name: "AT+QFTPSIZE"
+        command: "AT+QFTPSIZE=\"{path}\""
+        description: "Get file size on FTP server"
+        params:
+          - id: path
+            label: "Remote file path"
+            default: "/firmware.bin"
+      - name: "AT+QFTPSTAT"
+        command: "AT+QFTPSTAT"
+        description: "Query FTP connection status"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # GNSS TAB
+  # ─────────────────────────────────────────────────────────────────────────────
+  - name: "GNSS"
+    commands:
+      - name: "AT+QGPS=1"
+        command: "AT+QGPS=1"
+        description: "Enable GNSS engine (standalone mode)"
+      - name: "AT+QGPSEND"
+        command: "AT+QGPSEND"
+        description: "Turn off GNSS engine"
+      - name: "AT+QGPS?"
+        command: "AT+QGPS?"
+        description: "Query GNSS engine power state"
+      - name: "AT+QGPSLOC=2"
+        command: "AT+QGPSLOC=2"
+        description: "Get fix: lat, lon, HDOP, alt, fix mode"
+      - name: "AT+QGPSCFG=?"
+        command: "AT+QGPSCFG=?"
+        description: "List GNSS configuration parameters"
+      - name: "AT+QGPSCFG Priority"
+        command: "AT+QGPSCFG=\"priority\",0,{prio}"
+        description: "Set GNSS vs WWAN priority"
+        params:
+          - id: prio
+            label: "Priority"
+            type: select
+            options: ["0=GNSS priority", "1=WWAN priority"]
+            default: "0=GNSS priority"
+      - name: "AT+QGPSCFG NMEA"
+        command: "AT+QGPSCFG=\"gpsnmeatype\",{mask}"
+        description: "Set which NMEA sentences to output"
+        params:
+          - id: mask
+            label: "NMEA bitmask"
+            default: "1"
+            hint: "1=GGA, 2=RMC, 4=GSV, 8=GSA, 16=VTG"
+      - name: "AT+QGPSCFG NMEA src"
+        command: "AT+QGPSCFG=\"nmeasrc\",1"
+        description: "Enable NMEA output via AT port"
+      - name: "AT+QGPSGNMEA"
+        command: "AT+QGPSGNMEA=\"GGA\""
+        description: "Read one NMEA sentence (GGA/RMC/GSV/GSA)"
+      - name: "AT+QGPSDEL=0"
+        command: "AT+QGPSDEL=0"
+        description: "Delete all GNSS assistance data (cold start)"
+      - name: "AT+QGPSXTRA?"
+        command: "AT+QGPSXTRA?"
+        description: "Query XTRA assistance data status"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # CONFIG TAB
+  - name: "Configuration"
+    commands:
+      - name: "AT+QCFG (all keys)"
+        command: "AT+QCFG=?"
+        description: "List all supported QCFG configuration keys"
+
+      - name: AT+QCFG usbnet
+        command: AT+QCFG="usbnet",{mode}
+        get: AT+QCFG="usbnet"
+        description: Set USB network interface (EC2x family); saved setting takes effect after restart
+        params:
+        - id: mode
+          label: USB net mode
+          type: select
+          options:
+          - 0=NDIS/QMI
+          - 1=ECM
+          - 2=MBIM
+          - 3=RNDIS
+          default: 0=NDIS/QMI
+
+      - name: "AT+QCFG ledmode"
+        command: "AT+QCFG=\"ledmode\",{mode}"
+        get: "AT+QCFG=\"ledmode\""
+        description: "LED blinking mode"
+        params:
+          - id: mode
+            label: "LED mode"
+            type: select
+            options: ["0=off", "1=auto", "2=custom"]
+            default: "1=auto"
+      - name: "AT+QMBNCFG List"
+        command: "AT+QMBNCFG=\"list\""
+        description: "List available MBN carrier profiles"
+      - name: AT+QMBNCFG Select
+        command: AT+QMBNCFG="select","{profile}"
+        description: Select an MBN profile; selection and activation are separate, firmware-specific operations
+        params:
+        - id: profile
+          label: Profile name
+          default: ROW_Generic_3GPP
+          hint: From AT+QMBNCFG="list" output
+
+      - name: "AT+QMBNCFG Autosel"
+        command: "AT+QMBNCFG=\"autosel\",{en}"
+        description: "Enable/disable auto MBN profile selection"
+        params:
+          - id: en
+            label: "Auto select"
+            type: select
+            options: ["0=Disabled", "1=Enabled"]
+            default: "1=Enabled"
+
+  - name: "URC/Status"
+    commands:
+      - name: "AT+QINDCFG CSQ"
+        command: "AT+QINDCFG=\"csq\",1,0"
+        description: "Enable RSSI change URC (+QIND: csq,…)"
+      - name: "AT+QINDCFG ACT"
+        command: "AT+QINDCFG=\"act\",1,0"
+        description: "Enable RAT change URC (+QIND: act,…)"
+      - name: "AT+QINDCFG ring"
+        command: "AT+QINDCFG=\"ring\",1,0"
+        description: "Enable RING URC reporting"
+      - name: "AT+QINDCFG smsfull"
+        command: "AT+QINDCFG=\"smsfull\",1,0"
+        description: "Enable SMS storage full URC"
+      - name: "AT+QINDCFG=?"
+        command: "AT+QINDCFG=?"
+        description: "List all configurable URC indicators"
+      - name: AT+QURCCFG Port
+        command: AT+QURCCFG="urcport","{port}"
+        description: Route URCs to a supported port (EC2x/EG9x/EG2x-G/EM05); saved automatically
+        params:
+        - id: port
+          label: URC port
+          type: select
+          options:
+          - usbat
+          - usbmodem
+          - uart1
+          - uart2
+          - all
+          default: usbat
+        get: AT+QURCCFG="urcport"
+        caps: AT+QURCCFG=?
+
+      - name: "AT+QAPRDYIND?"
+        command: "AT+QAPRDYIND?"
+        description: "Query app-ready indication URC setting"
+      - name: "AT+QRIR"
+        command: "AT+QRIR"
+        description: "Restore RI pin to inactive state"
+
+  - name: "Firmware / Misc"
+    commands:
+      - name: "AT+QFOTADL=?"
+        command: "AT+QFOTADL=?"
+        description: "FOTA firmware OTA download syntax"
+      - name: "AT+QFLST"
+        command: "AT+QFLST=\"*\""
+        profiles: [ec2x]
+        description: "List all files in UFS storage"
+      - name: "AT+QFDEL"
+        command: "AT+QFDEL=\"{file}\""
+        profiles: [ec2x]
+        description: "Delete a file from UFS storage"
+        params:
+          - id: file
+            label: "File name"
+            default: "test.txt"
+      - name: AT+QFOPEN
+        command: AT+QFOPEN="{file}",2
+        profiles: [ec2x]
+        description: Open an existing file read-only (EC2x family); keep the returned handle for reads/close
+        params:
+        - id: file
+          label: File name
+          default: test.txt
+        caps: AT+QFOPEN=?
+
+      - name: AT+QFREAD
+        command: AT+QFREAD={handle},{length}
+        profiles: [ec2x]
+        description: Read bytes from an open file (EC2x family); uses the handle returned by QFOPEN
+        params:
+        - id: handle
+          label: File handle
+          default: '0'
+        - id: length
+          label: Bytes to read
+          default: '128'
+
+      - name: AT+QFCLOSE
+        command: AT+QFCLOSE={handle}
+        profiles: [ec2x]
+        description: Close an open file handle (EC2x family)
+        params:
+        - id: handle
+          label: File handle
+          default: '0'
+
+      - name: "AT+QPOWD=1"
+        command: "AT+QPOWD=1"
+        description: "Normal (graceful) power down"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # POWER TAB
+  # ─────────────────────────────────────────────────────────────────────────────
+  - name: "Power"
+    commands:
+      - name: "AT+QSCLK?"
+        command: "AT+QSCLK?"
+        description: "Query low-power sleep mode state"
+      - name: "AT+QSCLK=1"
+        command: "AT+QSCLK=1"
+        description: "Enable slow clock / sleep mode"
+      - name: "AT+QSCLK=0"
+        command: "AT+QSCLK=0"
+        description: "Disable slow clock / sleep mode"
+      - name: "AT+QADC=0"
+        command: "AT+QADC=0"
+        description: "Read ADC channel 0 voltage (mV)"
+      - name: AT+QADC=1
+        command: AT+QADC=1
+        description: Read ADC input channel 1 in mV (if supported); this is not a battery-voltage query
+
+      - name: "AT+QPOWD=0"
+        command: "AT+QPOWD=0"
+        description: "Immediate (hard) power off"
+      - name: "AT+QPOWD=1"
+        command: "AT+QPOWD=1"
+        description: "Normal (graceful) power off"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # OTHER TAB
+  # ─────────────────────────────────────────────────────────────────────────────
+  - name: "Audio"
+    commands:
+      - name: "AT+QAUDMOD?"
+        command: "AT+QAUDMOD?"
+        description: "Query audio mode (handset/headset/speaker)"
+      - name: "AT+QAUDMOD"
+        command: "AT+QAUDMOD={mode}"
+        description: "Set audio mode"
+        params:
+          - id: mode
+            label: "Audio mode"
+            type: select
+            options: ["0=Handset", "1=Headset", "2=Speaker", "3=BT"]
+            default: "0=Handset"
+      - name: "AT+CLVL?"
+        command: "AT+CLVL?"
+        description: "Query loudspeaker volume level (0–5)"
+      - name: "AT+CLVL"
+        command: "AT+CLVL={vol}"
+        description: "Set loudspeaker volume"
+        params:
+          - id: vol
+            label: "Volume (0-5)"
+            default: "5"
+      - name: "AT+CMUT?"
+        command: "AT+CMUT?"
+        description: "Query mute status (0=unmuted, 1=muted)"
+      - name: "AT+CMUT=1"
+        command: "AT+CMUT=1"
+        description: "Mute microphone"
+      - name: "AT+CMUT=0"
+        command: "AT+CMUT=0"
+        description: "Unmute microphone"
+      - name: "AT+QMIC?"
+        command: "AT+QMIC?"
+        description: "Query microphone gain settings"
+      - name: "AT+QRXGAIN?"
+        command: "AT+QRXGAIN?"
+        description: "Query RX downlink gain settings"
+      - name: "AT+QHUP"
+        command: "AT+QHUP={cause}"
+        description: "Hang up call with specific Q.850 cause"
+        params:
+          - id: cause
+            label: "Release cause"
+            default: "16"
+            hint: "16=Normal, 21=Rejected, 17=Busy"
+
+  - name: Sleep / Low Power
+    commands:
+      - name: AT+QPSMS?
+        command: AT+QPSMS?
+        description: Read network-assigned PSM timers (BG95 family)
+        profiles:
+        - bg95
+      - name: AT+QCSCON?
+        command: AT+QCSCON?
+        description: Read perceived RRC connection state (BG95 family)
+        profiles:
+        - bg95
+      - name: AT+QPTWEDRXS?
+        command: AT+QPTWEDRXS?
+        description: Read paging time-window and eDRX settings (BG95 family)
+        profiles:
+        - bg95

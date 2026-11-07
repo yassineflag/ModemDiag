@@ -1,0 +1,10 @@
+# Runtime dependencies
+pyserial>=3.5
+PyQt6>=6.4.0
+PyQt6-Qt6>=6.4.0
+pyyaml>=6.0
+cryptography>=41.0
+
+# Build tool (only needed to compile the binary)
+pyinstaller>=6.0
+tomli>=2.0; python_version < "3.11"

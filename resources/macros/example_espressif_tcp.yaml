@@ -1,0 +1,28 @@
+name: ESP-AT TCP payload template
+description: "ESP32/ESP8266 with ESP-AT. Join Wi-Fi first, configure host/port, then enable these single-connection steps. Requires the firmware's AT UART via USB-UART."
+manufacturer: Espressif ESP-AT
+steps:
+  - command: AT+CIPMUX=0
+    description: Select single-connection mode
+    enabled: false
+    on_failure: stop
+  - command: 'AT+CIPSTART="TCP","server.example.test",9000'
+    description: Open your TCP endpoint
+    enabled: false
+    timeout_ms: 30000
+    on_failure: stop
+  - command: AT+CIPSEND={length}
+    description: Send exact bytes and require SEND OK
+    enabled: false
+    prompt: '>'
+    payload: hello
+    payload_encoding: utf-8
+    payload_ending: none
+    final_ok: SEND OK
+    expect: SEND OK
+    fail_on: '^SEND FAIL\s*$'
+    timeout_ms: 30000
+    on_failure: stop
+  - command: AT+CIPCLOSE
+    description: Close the TCP connection
+    enabled: false

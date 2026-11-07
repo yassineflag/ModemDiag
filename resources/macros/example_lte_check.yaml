@@ -1,0 +1,49 @@
+name: "LTE Network Check"
+description: "Read LTE registration, signal quality and the context IP address"
+steps:
+  - command: "ATE0"
+    description: "Disable echo for clean output"
+    expect: "OK"
+    timeout_ms: 3000
+    delay_ms: 200
+
+  - command: "AT+CMEE=2"
+    description: "Verbose error reporting"
+    expect: "OK"
+    timeout_ms: 3000
+    delay_ms: 200
+
+  - command: "AT+CFUN=1"
+    description: "Ensure full functionality"
+    expect: "OK"
+    timeout_ms: 10000
+    delay_ms: 3000
+    on_failure: stop
+
+  - command: "AT+CPIN?"
+    description: "Check SIM is ready"
+    expect: "READY"
+    expect_regex: '^\+CPIN:\s*READY\s*$'
+    timeout_ms: 5000
+    delay_ms: 500
+    on_failure: stop
+
+  - command: "AT+CEREG?"
+    description: "Read LTE registration status"
+    expect: "+CEREG"
+    expect_regex: '^\+CEREG:\s*\d+\s*,\s*(?:1|5)(?:\s*,.*)?$'
+    timeout_ms: 5000
+    delay_ms: 500
+
+  - command: "AT+CESQ"
+    description: "Extended signal quality"
+    expect: "+CESQ"
+    timeout_ms: 3000
+    delay_ms: 300
+
+  - command: "AT+CGPADDR=1"
+    description: "Read IP address"
+    expect: "+CGPADDR"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue

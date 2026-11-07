@@ -1,0 +1,44 @@
+name: "SIM Card Health"
+description: "Verify SIM card presence, PIN status, ICCID, and IMSI"
+icon: "💳"
+steps:
+  - command: "AT+CPIN?"
+    description: "PIN status (READY = SIM present and unlocked)"
+    expect: "+CPIN"
+    expect_regex: '^\+CPIN:\s*READY\s*$'
+    timeout_ms: 5000
+    delay_ms: 300
+
+  - command: "AT+CCID"
+    description: "Read ICCID from SIM"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
+
+  - command: "AT+ICCID"
+    description: "Read ICCID (alternate command)"
+    expect: "OK"
+    timeout_ms: 3000
+    delay_ms: 300
+    on_failure: continue
+
+  - command: "AT+CIMI"
+    description: "Read IMSI from SIM"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 300
+
+  - command: "AT+CLCK=\"SC\",2"
+    description: "Query SIM lock (PIN lock) status"
+    expect: "OK"
+    timeout_ms: 3000
+    delay_ms: 300
+    on_failure: continue
+
+  - command: "AT+CPMS?"
+    description: "SMS storage used/total (also confirms SIM access)"
+    expect: "+CPMS"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue

@@ -1,0 +1,76 @@
+name: "Fibocom MA510 TCP Test"
+description: "Workflow template: configure APN/server and payload steps for your firmware. Payload steps start unchecked. OK confirms command acceptance, not remote delivery."
+icon: "🔌"
+manufacturer: "Fibocom"
+steps:
+  - command: "ATI"
+    description: "Module identification"
+    expect: "OK"
+    timeout_ms: 3000
+    delay_ms: 300
+  - command: "AT+CMEE=1"
+    description: "Enable numeric error codes"
+    expect: "OK"
+    timeout_ms: 3000
+    delay_ms: 300
+  - command: "AT+COPS?"
+    description: "Check current operator"
+    expect: "+COPS"
+    timeout_ms: 5000
+    delay_ms: 500
+  - command: "AT+CGREG=2"
+    description: "Enable GPRS registration URC with location"
+    expect: "OK"
+    timeout_ms: 3000
+    delay_ms: 300
+  - command: 'AT+CGDCONT=1,"IP","internet"'
+    description: "Set PDP context 1 APN"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 500
+  - command: 'AT+MIPCALL=1,"internet"'
+    description: "Request data-call activation"
+    expect: "OK"
+    timeout_ms: 30000
+    delay_ms: 2000
+    on_failure: stop
+  - command: 'AT+GTSET="IPRFMT",5'
+    description: "Select buffered IP data-read mode; verify firmware support"
+    expect: "OK"
+    timeout_ms: 3000
+    delay_ms: 300
+  - command: 'AT+MIPOPEN=1,,"203.0.113.10",3386,0'
+    description: "Request TCP socket setup (port 3386)"
+    expect: "OK"
+    timeout_ms: 15000
+    delay_ms: 1000
+    on_failure: stop
+  - command: "AT+CCLK?"
+    description: "Read RTC timestamp"
+    expect: "+CCLK"
+    timeout_ms: 3000
+    delay_ms: 300
+  - command: "AT+MIPSEND=1,12"
+    enabled: false
+    description: "Payload-send template; configure for firmware before enabling"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 500
+    on_failure: continue
+  - command: "AT+MIPREAD=1,12"
+    enabled: false
+    description: "Payload-read template; enable after configuring the send step"
+    expect: "+MIPREAD:"
+    timeout_ms: 10000
+    delay_ms: 1000
+    on_failure: continue
+  - command: "AT+MIPCLOSE=1"
+    description: "Close TCP socket"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 500
+  - command: "AT+MIPCALL=0"
+    description: "Deactivate data call"
+    expect: "OK"
+    timeout_ms: 10000
+    delay_ms: 3000

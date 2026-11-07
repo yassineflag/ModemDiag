@@ -1,0 +1,46 @@
+name: SIMCom MQTT publish template
+description: "SIM7070/7080/7090 example. Set APN and broker, then enable the steps you need. Payload length is calculated from UTF-8 bytes."
+manufacturer: SIMCom
+steps:
+  - command: 'AT+CNCFG=0,1,"internet"'
+    description: Configure your application APN
+    enabled: false
+    on_failure: stop
+  - command: AT+CNACT=0,1
+    description: Activate the application context and await confirmation
+    enabled: false
+    wait_for: '^\+APP PDP:\s*0,ACTIVE\s*$'
+    fail_on: '^\+APP PDP:\s*0,DEACTIVE\s*$'
+    timeout_ms: 60000
+    on_failure: stop
+  - command: 'AT+SMCONF="URL","broker.example.test",1883'
+    description: Set your broker hostname and port
+    enabled: false
+    on_failure: stop
+  - command: 'AT+SMCONF="CLIENTID","modemdiag"'
+    description: Set a unique client identity
+    enabled: false
+    on_failure: stop
+  - command: AT+SMCONN
+    description: Connect to the configured broker
+    enabled: false
+    timeout_ms: 60000
+    on_failure: stop
+  - command: AT+SMSTATE?
+    description: Require a connected MQTT session
+    enabled: false
+    expect_regex: '^\+SMSTATE:\s*1\s*$'
+    on_failure: stop
+  - command: 'AT+SMPUB="modemdiag/test",{length},0,0'
+    description: Publish exact UTF-8 payload bytes after the prompt
+    enabled: false
+    prompt: '>'
+    payload: hello
+    payload_encoding: utf-8
+    payload_ending: none
+    timeout_ms: 30000
+    on_failure: stop
+  - command: AT+SMDISC
+    description: Disconnect the MQTT session
+    enabled: false
+

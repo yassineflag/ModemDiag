@@ -1,0 +1,768 @@
+categories:
+- name: Identity & Info
+  commands:
+  - name: AT
+    command: AT
+    description: Check that the modem AT interface responds
+  - name: ATI
+    command: ATI
+    description: Read module identification; returned fields depend on the firmware
+  - name: AT+CGMI
+    command: AT+CGMI
+    description: Manufacturer identification string
+  - name: AT+CGMM
+    command: AT+CGMM
+    description: Model identification string
+  - name: AT+CGMR
+    command: AT+CGMR
+    description: Firmware revision string
+  - name: AT+CGSN
+    command: AT+CGSN
+    description: Read the device identity (usually IMEI); exact format is module-specific
+  - name: AT+CGSN=1
+    command: AT+CGSN=1
+    description: Read IMEI using the explicit identity selector (if supported)
+  - name: AT+CLAC
+    command: AT+CLAC
+    description: List commands advertised by this firmware; availability is module-specific
+  - name: AT+CCLK?
+    command: AT+CCLK?
+    description: Query real-time clock (date and time)
+  - name: AT+CTZU=1
+    command: AT+CTZU=1
+    description: Enable automatic time zone update from network
+  - name: AT+CGSN=2
+    command: AT+CGSN=2
+    description: Read IMEISV (identity including software version), if supported
+- name: SIM Card
+  commands:
+  - name: AT+CPIN?
+    command: AT+CPIN?
+    description: SIM PIN status (READY / SIM PIN / SIM PUK …)
+  - name: AT+CCID
+    command: AT+CCID
+    description: SIM ICCID (Integrated Circuit Card Identifier)
+  - name: AT+CIMI
+    command: AT+CIMI
+    description: IMSI (International Mobile Subscriber Identity)
+  - name: AT+CLCK="SC",2
+    command: AT+CLCK="SC",2
+    description: Query SIM PIN lock status
+    caps: AT+CLCK=?
+- name: Network Registration
+  commands:
+  - name: AT+CREG
+    command: AT+CREG={n}
+    get: AT+CREG?
+    caps: AT+CREG=?
+    description: CS network registration status & URC configuration
+    params:
+    - id: n
+      label: URC mode
+      type: select
+      options:
+      - 0=disabled
+      - 1=enabled
+      - 2=with location
+      default: 0=disabled
+  - name: AT+CGREG
+    command: AT+CGREG={n}
+    get: AT+CGREG?
+    caps: AT+CGREG=?
+    description: GPRS/EGPRS registration status & URC configuration
+    params:
+    - id: n
+      label: URC mode
+      type: select
+      options:
+      - 0=disabled
+      - 1=enabled
+      - 2=with location
+      default: 0=disabled
+  - name: AT+CEREG
+    command: AT+CEREG={n}
+    get: AT+CEREG?
+    caps: AT+CEREG=?
+    description: EPS (LTE) network registration status & URC configuration
+    params:
+    - id: n
+      label: URC mode
+      type: select
+      options:
+      - 0=disabled
+      - 1=enabled
+      - 2=with location
+      - 3=with EMM cause
+      - 4=PSM info
+      - 5=all
+      default: 0=disabled
+  - name: AT+C5GREG
+    command: AT+C5GREG={n}
+    get: AT+C5GREG?
+    caps: AT+C5GREG=?
+    description: Read 5GS registration or configure URCs; use Caps for additional supported modes
+    params:
+    - id: n
+      label: URC mode
+      type: select
+      options:
+      - 0=disabled
+      - 1=enabled
+      - 2=with location
+      default: 0=disabled
+  - name: AT+COPS
+    command: AT+COPS={mode},{format},"{oper}",{AcT}
+    get: AT+COPS?
+    caps: AT+COPS=?
+    description: Select an operator; Caps scans networks and may take several minutes
+    params:
+    - id: mode
+      label: Mode
+      type: select
+      options:
+      - 0=auto
+      - 1=manual
+      - 2=deregister
+      - 3=set format only
+      - 4=manual then auto
+      default: 0=auto
+    - id: format
+      label: Format
+      type: select
+      options:
+      - 0=long
+      - 1=short
+      - 2=numeric
+      default: 2=numeric
+    - id: oper
+      label: Operator (MCC+MNC)
+      default: ''
+      hint: e.g. 20801
+    - id: AcT
+      label: Access tech
+      type: select
+      options:
+      - 0=GSM
+      - 2=UTRAN
+      - 7=LTE
+      - 9=NB-IoT
+      - 13=LTE/NR dual connectivity
+      default: 7=LTE
+  - name: AT+CGATT
+    command: AT+CGATT={state}
+    get: AT+CGATT?
+    description: PS attach / detach
+    params:
+    - id: state
+      label: State
+      type: select
+      options:
+      - 1=attach
+      - 0=detach
+      default: 1=attach
+  - name: AT+CEER
+    command: AT+CEER
+    description: Extended error report — last call/PDP failure
+  - name: AT+CUSD
+    command: AT+CUSD={n},{str},{dcs}
+    get: AT+CUSD?
+    caps: AT+CUSD=?
+    description: Send USSD string
+    params:
+    - id: n
+      label: Mode
+      type: select
+      options:
+      - 0=disable URC
+      - 1=enable URC
+      - 2=cancel session
+      default: 1=enable URC
+    - id: str
+      label: USSD string
+      default: '"*100#"'
+      hint: e.g. "*100#"
+    - id: dcs
+      label: DCS
+      default: '15'
+- name: Signal Quality
+  commands:
+  - name: AT+CSQ
+    command: AT+CSQ
+    description: Read RSSI and BER codes; RSSI 99 means unknown, not excellent signal
+  - name: AT+CESQ
+    command: AT+CESQ
+    description: 'Read signal-quality codes: RXLEV, BER, RSCP, Ec/No, RSRQ and RSRP'
+  - name: AT+CRFSTS
+    command: AT+CRFSTS
+    description: 'Model-specific; verify support: Radio frequency status: band, EARFCN, cell ID'
+- name: Data / PDP
+  commands:
+  - name: AT+CGDCONT
+    command: AT+CGDCONT={cid},"{type}","{apn}"
+    description: Define a context with PDP type and APN; this does not activate data
+    params:
+    - id: cid
+      label: Context ID (CID)
+      default: '1'
+      hint: Usually 1 for primary bearer
+    - id: type
+      label: PDP type
+      type: select
+      options:
+      - IP=IPv4
+      - IPV6=IPv6
+      - IPV4V6=dual stack
+      - Non-IP=non-IP data
+      default: IP=IPv4
+    - id: apn
+      label: APN
+      default: ''
+      hint: e.g. internet or m2m.operator.com
+    get: AT+CGDCONT?
+    caps: AT+CGDCONT=?
+  - name: AT+CGDCONT delete
+    command: AT+CGDCONT={cid}
+    description: Delete/reset a PDP context
+    params:
+    - id: cid
+      label: Context ID
+      default: '1'
+    get: AT+CGDCONT?
+    caps: AT+CGDCONT=?
+  - name: AT+CGACT activate
+    command: AT+CGACT=1,{cid}
+    description: Activate a PDP context
+    params:
+    - id: cid
+      label: Context ID
+      default: '1'
+    get: AT+CGACT?
+  - name: AT+CGACT deactivate
+    command: AT+CGACT=0,{cid}
+    description: Deactivate a PDP context
+    params:
+    - id: cid
+      label: Context ID
+      default: '1'
+    get: AT+CGACT?
+  - name: AT+CGPADDR
+    command: AT+CGPADDR={cid}
+    description: Get assigned IP address for context
+    params:
+    - id: cid
+      label: Context ID
+      default: '1'
+  - name: AT+CGAUTH
+    command: AT+CGAUTH={cid},{type},"{user}","{pass}"
+    description: Set context authentication; supported protocols depend on the module
+    params:
+    - id: cid
+      label: Context ID
+      default: '1'
+    - id: type
+      label: Auth type
+      type: select
+      options:
+      - 0=None
+      - 1=PAP
+      - 2=CHAP
+      default: 0=None
+    - id: user
+      label: Username
+      default: ''
+      hint: Leave empty if not required
+    - id: pass
+      label: Password
+      default: ''
+      hint: Leave empty if not required
+    get: AT+CGAUTH?
+    caps: AT+CGAUTH=?
+  - name: AT+CGDATA caps
+    command: AT+CGDATA=?
+    description: List supported packet-data protocols; this does not query connection state
+  - name: AT+CGCONTRDP
+    command: AT+CGCONTRDP={cid}
+    caps: AT+CGCONTRDP=?
+    description: Read active context parameters, including assigned addresses and DNS if available
+    params:
+    - id: cid
+      label: Active context ID
+      default: '1'
+- name: Power & Mode
+  commands:
+  - name: AT+CFUN
+    command: AT+CFUN={fun},{rst}
+    get: AT+CFUN?
+    caps: AT+CFUN=?
+    description: Change functionality; RF-off or reset can disconnect the network
+    params:
+    - id: fun
+      label: Functionality
+      type: select
+      options:
+      - 0=minimum (RF off)
+      - 1=full
+      - 4=airplane mode
+      default: 1=full
+    - id: rst
+      label: Reset
+      type: select
+      options:
+      - 0=no reset
+      - 1=reset before setting
+      default: 0=no reset
+  - name: AT+CPOF
+    command: AT+CPOF
+    description: 'Model-specific; verify support: Power off module'
+- name: Serial / Terminal
+  commands:
+  - name: ATE0
+    command: ATE0
+    description: Disable command echo
+  - name: ATE1
+    command: ATE1
+    description: Enable command echo
+  - name: ATV1
+    command: ATV1
+    description: Verbose response format
+  - name: ATV0
+    command: ATV0
+    description: Numeric response format
+  - name: AT+CMEE
+    command: AT+CMEE={n}
+    get: AT+CMEE?
+    caps: AT+CMEE=?
+    description: Configure extended error reporting format
+    params:
+    - id: n
+      label: Mode
+      type: select
+      options:
+      - 0=disabled
+      - 1=numeric +CME code
+      - 2=verbose text
+      default: 2=verbose text
+  - name: AT+IFC
+    command: AT+IFC={DCE_by_DTE},{DTE_by_DCE}
+    get: AT+IFC?
+    caps: AT+IFC=?
+    description: Set DTE-DCE flow control
+    params:
+    - id: DCE_by_DTE
+      label: DTE→DCE flow
+      type: select
+      options:
+      - 0=none
+      - 1=XON/XOFF
+      - 2=RTS/CTS
+      default: 2=RTS/CTS
+    - id: DTE_by_DCE
+      label: DCE→DTE flow
+      type: select
+      options:
+      - 0=none
+      - 1=XON/XOFF
+      - 2=RTS/CTS
+      default: 2=RTS/CTS
+  - name: AT+IPR
+    command: AT+IPR={rate}
+    get: AT+IPR?
+    caps: AT+IPR=?
+    description: Fixed DTE interface rate (baud rate)
+    params:
+    - id: rate
+      label: Baud rate
+      type: select
+      options:
+      - 0=auto
+      - '9600'
+      - '19200'
+      - '38400'
+      - '57600'
+      - '115200'
+      - '230400'
+      - '460800'
+      - '921600'
+      default: '115200'
+  - name: AT&F
+    command: AT&F
+    description: Restore modem factory profile; this changes device settings, not the app
+  - name: AT&W
+    command: AT&W
+    description: Save the supported modem profile to nonvolatile memory; scope is module-specific
+  - name: AT+CCLK
+    command: AT+CCLK="{time}"
+    get: AT+CCLK?
+    description: Real-time clock — read or set
+    params:
+    - id: time
+      label: Time (yy/mm/dd,hh:mm:ss±tz)
+      default: ''
+      hint: e.g. 26/11/04,12:00:00+04; timezone is in 15-minute units
+  - name: AT+CTZU
+    command: AT+CTZU={onoff}
+    get: AT+CTZU?
+    description: Auto timezone update via network
+    params:
+    - id: onoff
+      label: Enable
+      type: select
+      options:
+      - 0=disable
+      - 1=enable
+      default: 1=enable
+- name: SMS
+  commands:
+  - name: AT+CMGF
+    command: AT+CMGF={mode}
+    get: AT+CMGF?
+    description: SMS message format (PDU vs text mode)
+    params:
+    - id: mode
+      label: Mode
+      type: select
+      options:
+      - 0=PDU mode
+      - 1=text mode
+      default: 1=text mode
+  - name: AT+CMGS
+    command: AT+CMGS="{number}"
+    description: Start the SMS text prompt; raw message bytes and Ctrl-Z are required to finish
+    params:
+    - id: number
+      label: Destination number
+      default: '+33612345678'
+      hint: E.164 format e.g. +33612345678
+  - name: AT+CMGR
+    command: AT+CMGR={index}
+    description: Read SMS message at given storage index
+    params:
+    - id: index
+      label: Message index
+      default: '1'
+      hint: Use AT+CMGL to list indices
+  - name: AT+CMGL ALL
+    command: AT+CMGL="ALL"
+    description: List all SMS messages in storage
+  - name: AT+CMGL UNREAD
+    command: AT+CMGL="UNREAD"
+    description: List only unread messages
+  - name: AT+CMGD
+    command: AT+CMGD={index},{flag}
+    description: Delete SMS message(s)
+    params:
+    - id: index
+      label: Message index
+      default: '1'
+    - id: flag
+      label: Delete scope
+      type: select
+      options:
+      - 0=this index only
+      - 1=all read
+      - 2=read+sent
+      - 3=read+sent+unsent
+      - 4=all messages
+      default: 0=this index only
+  - name: AT+CSCA
+    command: AT+CSCA="{smsc}"
+    description: Set SMS service centre address
+    params:
+    - id: smsc
+      label: SMSC number
+      default: '+33600000000'
+      hint: Your operator SMSC number
+    get: AT+CSCA?
+  - name: AT+CPMS
+    command: AT+CPMS="{mem1}","{mem2}","{mem3}"
+    get: AT+CPMS?
+    caps: AT+CPMS=?
+    description: Preferred message storage selection
+    params:
+    - id: mem1
+      label: Read storage
+      type: select
+      options:
+      - SM=SIM
+      - ME=module
+      - MT=combined
+      default: SM=SIM
+    - id: mem2
+      label: Write storage
+      type: select
+      options:
+      - SM=SIM
+      - ME=module
+      - MT=combined
+      default: SM=SIM
+    - id: mem3
+      label: Received storage
+      type: select
+      options:
+      - SM=SIM
+      - ME=module
+      - MT=combined
+      default: SM=SIM
+- name: Calls
+  commands:
+  - name: ATD (voice)
+    command: ATD{number};
+    description: Dial voice call (semicolon keeps command mode)
+    params:
+    - id: number
+      label: Phone number
+      default: '+33612345678'
+      hint: E.164 e.g. +33612345678
+  - name: ATA
+    command: ATA
+    description: Answer incoming call
+  - name: ATH
+    command: ATH
+    description: Hang up / terminate active call
+  - name: AT+CHUP
+    command: AT+CHUP
+    description: Terminate voice calls, including held and waiting calls if supported
+  - name: AT+CLCC
+    command: AT+CLCC
+    description: List current calls — index, direction, status, mode
+  - name: AT+CHLD
+    command: AT+CHLD={action}
+    description: Hold / resume / conference / transfer
+    params:
+    - id: action
+      label: Action
+      type: select
+      options:
+      - 0=release held
+      - 1=release active+accept held
+      - 2=hold active+accept held
+      - 3=multiparty conference
+      - 4=ECT transfer
+      default: 2=hold active+accept held
+  - name: AT+CLIP=1
+    command: AT+CLIP=1
+    description: Enable caller ID URC on incoming calls
+    get: AT+CLIP?
+    caps: AT+CLIP=?
+  - name: AT+CCWA=1
+    command: AT+CCWA=1,1,1
+    description: Enable call-waiting URC for voice calls
+    get: AT+CCWA?
+    caps: AT+CCWA=?
+  - name: AT+CCFC query
+    command: AT+CCFC={reason},2
+    description: Query call forwarding rule
+    params:
+    - id: reason
+      label: Reason
+      type: select
+      options:
+      - 0=unconditional
+      - 1=busy
+      - 2=no-reply
+      - 3=not-reachable
+      default: 0=unconditional
+  - name: AT+CCFC set
+    command: AT+CCFC={reason},3,"{number}",145
+    description: Forward calls to a number
+    params:
+    - id: reason
+      label: Reason
+      type: select
+      options:
+      - 0=unconditional
+      - 1=busy
+      - 2=no-reply
+      - 3=not-reachable
+      default: 2=no-reply
+    - id: number
+      label: Forward to
+      default: '+33612345678'
+  - name: AT+CUSD
+    command: AT+CUSD=1,"{ussd}",15
+    description: Send USSD string (balance check, top-up, etc.)
+    params:
+    - id: ussd
+      label: USSD code
+      default: '*#100#'
+      hint: e.g. *#100# for balance
+  - name: AT+COLP
+    command: AT+COLP={mode}
+    description: Connected line identification presentation
+    get: AT+COLP?
+    params:
+    - id: mode
+      label: Mode
+      type: select
+      options:
+      - 0=disable
+      - 1=enable
+      default: 1=enable
+  - name: AT+CRC
+    command: AT+CRC={mode}
+    description: Extended RING result codes (show call type)
+    get: AT+CRC?
+    params:
+    - id: mode
+      label: Mode
+      type: select
+      options:
+      - 0=disable
+      - 1=enable
+      default: 1=enable
+  - name: AT+CVHU
+    command: AT+CVHU={mode}
+    description: Allow ATH to hang up voice calls
+    get: AT+CVHU?
+    params:
+    - id: mode
+      label: Mode
+      type: select
+      options:
+      - 0=ATH disconnects voice
+      - 1=ATH ignored
+      default: 0=ATH disconnects voice
+- name: PSM & eDRX
+  commands:
+  - name: AT+CPSMS
+    command: AT+CPSMS={mode},"{rau}","{gprs_timer}","{tau}","{active}"
+    get: AT+CPSMS?
+    caps: AT+CPSMS=?
+    description: Request PSM timers; network acceptance and actual timers may differ
+    params:
+    - id: mode
+      label: PSM mode
+      type: select
+      options:
+      - 0=disable
+      - 1=enable
+      - 2=disable+reset
+      default: 1=enable
+    - id: rau
+      label: RAU timer (T3312)
+      default: '00100001'
+      hint: binary octet e.g. 00100001
+    - id: gprs_timer
+      label: GPRS timer (T3314)
+      default: '00100001'
+    - id: tau
+      label: TAU timer (T3412)
+      default: '00000100'
+      hint: binary octet
+    - id: active
+      label: Active timer (T3324)
+      default: '00001000'
+  - name: AT+CEDRXS
+    command: AT+CEDRXS={mode},{AcT},"{edrx_val}"
+    get: AT+CEDRXS?
+    caps: AT+CEDRXS=?
+    description: Request eDRX; use CEDRXRDP to inspect network-provided values
+    params:
+    - id: mode
+      label: Mode
+      type: select
+      options:
+      - 0=disable
+      - 1=enable
+      - 2=enable+URC
+      - 3=disable+reset
+      default: 2=enable+URC
+    - id: AcT
+      label: Access tech
+      type: select
+      options:
+      - 4=E-UTRAN (LTE)
+      - 5=NB-IoT
+      default: 4=E-UTRAN (LTE)
+    - id: edrx_val
+      label: eDRX value
+      default: '0010'
+      hint: binary nibble e.g. 0010
+  - name: AT+CEDRXRDP
+    command: AT+CEDRXRDP
+    description: Read requested and network-provided eDRX values for the active RAT
+  - name: AT+CRCES
+    command: AT+CRCES
+    get: AT+CRCES?
+    description: 'Model-specific; verify support: Coverage Enhancement status'
+  - name: AT+CSCON
+    command: AT+CSCON={n}
+    get: AT+CSCON?
+    caps: AT+CSCON=?
+    description: Signalling connection status URC
+    params:
+    - id: n
+      label: Mode
+      type: select
+      options:
+      - 0=disable URC
+      - 1=enable URC
+      default: 1=enable URC
+  - name: AT+CNEC
+    command: AT+CNEC={n}
+    get: AT+CNEC?
+    description: NAS EMM / ESM cause code reporting
+    params:
+    - id: n
+      label: Mode
+      type: select
+      options:
+      - 0=disable
+      - 24=enable EMM+ESM
+      default: 24=enable EMM+ESM
+  - name: AT+CIPCA
+    command: AT+CIPCA={n}
+    get: AT+CIPCA?
+    description: Initial PDP context activation control
+    params:
+    - id: n
+      label: Mode
+      type: select
+      options:
+      - 0=not activated
+      - 1=activated
+      default: 1=activated
+- name: 5G / NR
+  commands:
+  - name: AT+C5GREG
+    command: AT+C5GREG={n}
+    get: AT+C5GREG?
+    caps: AT+C5GREG=?
+    description: Read 5GS registration or configure URCs; use Caps for additional supported modes
+    params:
+    - id: n
+      label: URC mode
+      type: select
+      options:
+      - 0=disabled
+      - 1=enabled
+      - 2=with location
+      default: 0=disabled
+  - name: AT+CNSLPI
+    command: AT+CNSLPI={mode}
+    get: AT+CNSLPI?
+    caps: AT+CNSLPI=?
+    description: Connected-mode LTE low-power indication
+    params:
+    - id: mode
+      label: Mode
+      type: select
+      options:
+      - 0=not allowed
+      - 1=allowed
+      default: 1=allowed
+  - name: AT+CSUPM
+    command: AT+CSUPM={mode}
+    get: AT+CSUPM?
+    description: 'Model-specific; verify support: UE policy management mode'
+    params:
+    - id: mode
+      label: Mode
+      type: select
+      options:
+      - 0=disable
+      - 1=enable
+      default: 1=enable
+  - name: AT+CUSATD?
+    command: AT+CUSATD?
+    description: 'Model-specific; verify support: USAT download test query'

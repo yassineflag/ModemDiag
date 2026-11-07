@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+.eggs/
+
+# Local-only settings, builds, downloads, reports, drafts and backups
+/local-ignored/
+
+# Legacy generated locations (also protected during migration)
+/dist/
+/build/
+/.release-cache/
+/third-party-source/
+
+# Logs (generated at runtime)
+logs/
+*.log
+
+# Legacy settings migrate to local-ignored/runtime/
+config.yaml
+quick_send.yaml
+user_commands.yaml
+release-policy-cache.json
+appearance.json
+# Defense in depth: the signing tool also refuses keys inside this repository.
+*.pem
+*.key
+*.pdf
+
+# Legacy custom automations; the public example is now in resources/macros/.
+/macros/
+
+# Local review and correspondence drafts (not part of the public project).
+/docs/*_REVIEW.md
+/docs/*_POLICY.md
+/docs/*_REQUEST.md
+/docs/DISTRIBUTION.md
+
+# Local agent settings, credentials and environment files
+.claude/
+.codex/
+.agents/
+.aws/
+.env
+.env.*
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

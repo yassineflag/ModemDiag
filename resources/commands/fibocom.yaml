@@ -1,0 +1,705 @@
+# Vendor support varies by module and firmware; use Caps and the module manual.
+manufacturer: "Fibocom"
+profiles:
+  fm350: "FM350 / documented firmware"
+  fm160: "FM160 / FG160 (MBB)"
+  g5g6: "G5 / G6"
+  nl668: "NL668"
+color: "#0078d4"
+
+categories:
+
+  - name: "Version & Identity"
+    commands:
+      - name: FW Version
+        command: AT+GTMCFWVER
+        profiles: [fm350]
+        description: "Read original firmware revision (FM350)"
+      - name: "SDK Version"
+        command: "AT+GTSDK"
+        description: "Get SDK/software version"
+      - name: "HW Version"
+        command: "AT+GTHWVER"
+        description: "Get hardware version"
+
+  - name: "USB & Interface"
+    commands:
+      - name: "USB Mode?"
+        command: "AT+GTUSBMODE?"
+        profiles: [fm160]
+        description: "Query USB working mode (NDIS, ECM, MBIM, etc.)"
+      - name: "USB Mode MBIM"
+        command: "AT+GTUSBMODE=29"
+        profiles: [fm160]
+        description: "MBIM + AT + DIAG (FM160/FG160); restart required"
+      - name: "USB Mode ECM"
+        command: "AT+GTUSBMODE=33"
+        profiles: [fm160]
+        description: "ECM composition (FM160/FG160); restart required"
+      - name: "USB Mode RMNET"
+        command: "AT+GTUSBMODE=32"
+        profiles: [fm160]
+        description: "RMNET composition (FM160/FG160); restart required"
+      - name: "USB Mode 0 (legacy)"
+        command: "AT+GTUSBMODE=0"
+        description: "Select USB composition 0 on supporting firmware; composition depends on module"
+
+  - name: "Radio Access"
+    commands:
+      - name: "RAT"
+        command: "AT+GTRAT={rat}"
+        profiles: [fm160]
+        get: "AT+GTRAT?"
+        caps: "AT+GTRAT=?"
+        description: "Select RAT (FM160/FG160); use Caps for firmware-supported values"
+        params:
+          - id: rat
+            label: RAT
+            type: select
+            options: ["10=Auto", "2=UMTS", "3=LTE", "4=LTE/UMTS", "14=NR", "17=NR/LTE", "20=NR/UMTS/LTE"]
+            default: "10=Auto"
+
+      - name: "Set Auto RAT"
+        command: "AT+GTRAT=10"
+        profiles: [fm160]
+        description: "Set automatic RAT selection"
+      - name: "RAT & Bands?"
+        command: "AT+GTACT?"
+        profiles: [fm350, fm160]
+        description: "Query RAT, preferred RAT and bands (FM160/FG160)"
+      - name: "Band Select?"
+        command: "AT+GTBANDSEL?"
+        description: "Query LTE/NR band selection"
+
+  - name: "Network & Signal"
+    commands:
+      - name: "Cell Info"
+        command: "AT+GTCCINFO?"
+        profiles: [fm350, fm160]
+        description: "Get serving cell information"
+      - name: "Carrier Agg."
+        command: "AT+GTCAINFO?"
+        profiles: [fm350, fm160]
+        description: "Query carrier aggregation status"
+      - name: "NW Scan"
+        command: "AT+GTNWSCAN"
+        description: "Scan for available networks"
+      - name: "NR Info"
+        command: "AT+GTNRINFO"
+        description: "Get 5G NR connection information"
+
+  - name: "GNSS"
+    commands:
+      - name: "GNSS On"
+        command: "AT+GTGPSPOWER=1"
+        profiles: [fm350, fm160]
+        description: "Enable GNSS engine"
+      - name: "GNSS Off"
+        command: "AT+GTGPSPOWER=0"
+        profiles: [fm350, fm160]
+        description: "Disable GNSS engine"
+      - name: "Location"
+        command: "AT+GTGPS?"
+        profiles: [fm160]
+        description: "Get current GNSS position fix"
+
+  - name: "Power"
+    commands:
+      - name: "Reset (legacy)"
+        command: "AT+GTRESET"
+        description: "Request a software reset on supporting firmware"
+      - name: "Power Down"
+        command: "AT+CPWROFF"
+        profiles: [fm350, fm160]
+        description: "Power off the module (FM160/FG160)"
+      - name: "Low Power?"
+        command: "AT+GTLPMMODE?"
+        profiles: [nl668]
+        description: "Query low power mode configuration"
+
+  - name: "GNSS (GT commands)"
+    commands:
+      - name: "AT+GTGPSPOWER"
+        command: "AT+GTGPSPOWER={mode}"
+        profiles: [fm350, fm160]
+        get: "AT+GTGPSPOWER?"
+        caps: "AT+GTGPSPOWER=?"
+        description: "Control GNSS module power switch (FM101/FM160/FM170/FM180/FM190 series)"
+        params:
+          - id: mode
+            label: GNSS Power
+            type: select
+            options: ["0=power off", "1=power on"]
+            default: "1=power on"
+
+      - name: "AT+GTGPS"
+        command: 'AT+GTGPS="{item}"'
+        profiles: [fm160]
+        get: "AT+GTGPS?"
+        caps: "AT+GTGPS=?"
+        description: "Read an NMEA sentence; Get reads all navigation data (F1 series)"
+        params:
+          - id: item
+            label: NMEA sentence
+            type: select
+            options: ["RMC", "GGA", "GSA", "GSV"]
+            default: "RMC"
+            hint: "GSV is unavailable on Qualcomm platforms"
+
+      - name: "AT+GTGPSEPO"
+        command: "AT+GTGPSEPO={mode}"
+        profiles: [fm160]
+        get: "AT+GTGPSEPO?"
+        caps: "AT+GTGPSEPO=?"
+        description: "Enable or disable AGPS / EPO assisted GNSS function"
+        params:
+          - id: mode
+            label: Mode
+            type: select
+            options: ["0=disable AGPS", "1=MSB mode", "2=MSA mode"]
+            default: "1=MSB mode"
+
+      - name: "AT+GTAGPSSERV"
+        command: "AT+GTAGPSSERV=\"{server}\",{port}"
+        profiles: [fm160]
+        get: "AT+GTAGPSSERV?"
+        caps: "AT+GTAGPSSERV=?"
+        description: "Set AGPS/SUPL server address and port"
+        params:
+          - id: server
+            label: Server IP or URL
+            default: "supl.qxwz.com"
+            hint: "e.g. supl.qxwz.com or 192.168.1.1"
+          - id: port
+            label: Port
+            default: "7276"
+            hint: "Typically 7275 (TCP) or 7276 (TLS)"
+
+      - name: "AT+GTGPSCFG"
+        command: "AT+GTGPSCFG={x},{value}"
+        profiles: [fm160]
+        get: "AT+GTGPSCFG?"
+        caps: "AT+GTGPSCFG=?"
+        description: "Configure SUPL or satellite selection (F1 series); values depend on index"
+        params:
+          - id: x
+            label: Parameter index
+            type: select
+            options: ["0=SUPL version", "2=Satellite combination", "3=SUPL certificate checking", "4=Set certificate (non-Qualcomm)", "5=Delete certificate (non-Qualcomm)"]
+            default: "0=SUPL version"
+          - id: value
+            label: Value
+            default: "1"
+            hint: "Use the module manual for the selected index"
+
+      - name: "AT+GTGPSCERT"
+        command: "AT+GTGPSCERT={operation},{num},{length}"
+        profiles: [fm160]
+        get: "AT+GTGPSCERT?"
+        caps: "AT+GTGPSCERT=?"
+        description: "Input or delete SUPL TLS certificate for A-GNSS"
+        params:
+          - id: operation
+            label: Operation
+            type: select
+            options: ["0=delete cert", "1=input cert"]
+            default: "0=delete cert"
+          - id: num
+            label: Certificate slot (1-9)
+            default: "1"
+          - id: length
+            label: Cert length bytes (input only)
+            default: ""
+            hint: "Leave blank to delete; input needs 1-2000 bytes, then certificate payload"
+
+  - name: "Module Control"
+    commands:
+      - name: "AT+GTFMODE"
+        command: "AT+GTFMODE={n}"
+        profiles: [fm350, fm160, nl668]
+        get: "AT+GTFMODE?"
+        caps: "AT+GTFMODE=?"
+        description: "Enable/disable hardware flight mode pin control"
+        params:
+          - id: n
+            label: HW flight mode
+            type: select
+            options: ["0=pin disabled", "1=pin enabled"]
+            default: "0=pin disabled"
+
+      - name: "AT+GTDUALSIM"
+        command: "AT+GTDUALSIM={sim_app}"
+        profiles: [fm350, fm160]
+        get: "AT+GTDUALSIM?"
+        caps: "AT+GTDUALSIM=?"
+        description: "Switch carrier SIM card / dual SIM selection"
+        params:
+          - id: sim_app
+            label: SIM slot
+            type: select
+            options: ["0=SIM1", "1=SIM2"]
+            default: "0=SIM1"
+
+      - name: "AT+GTSETMBN"
+        command: 'AT+GTSETMBN={mode},{carrier}'
+        get: "AT+GTSETMBN?"
+        caps: "AT+GTSETMBN=?"
+        description: "Set MBN (carrier profile) mode — auto or manual selection"
+        params:
+          - id: mode
+            label: Mode
+            type: select
+            options: ["0=auto", "1=manual", "2=deactivate"]
+            default: "0=auto"
+          - id: carrier
+            label: Carrier name (manual only)
+            default: ""
+            hint: 'Quoted MBN name from Caps (manual only), e.g. "ROW_Commercial"'
+
+      - name: "AT+MSTART"
+        command: "AT+MSTART={n}"
+        profiles: [g5g6]
+        get: "AT+MSTART?"
+        description: "Enable/disable start message URC notification"
+        params:
+          - id: n
+            label: Enable
+            type: select
+            options: ["0=disable", "1=enable"]
+            default: "1=enable"
+
+      - name: "AT+GTUSIM"
+        command: "AT+GTUSIM"
+        profiles: [nl668]
+        get: "AT+GTUSIM?"
+        description: "Check USIM card type and status"
+
+      - name: "AT+CFSN"
+        command: "AT+CFSN"
+        profiles: [fm350, fm160, g5g6, nl668]
+        description: "Request factory serial number"
+
+  - name: "Sleep / Low Power"
+    commands:
+      - name: "AT+SLPMODE"
+        command: "AT+SLPMODE={mode}"
+        profiles: [fm160]
+        get: "AT+SLPMODE?"
+        caps: "AT+SLPMODE=?"
+        description: "Control module sleep mode (0=disable, 1=enable)"
+        params:
+          - id: mode
+            label: Sleep mode
+            type: select
+            options: ["0=disable", "1=enable"]
+            default: "0=disable"
+
+      - name: "AT+GTWAKE"
+        command: "AT+GTWAKE={mode},{sub_mode}"
+        profiles: [nl668]
+        get: "AT+GTWAKE?"
+        caps: "AT+GTWAKE=?"
+        description: "Enable wake-up host function via RI pin"
+        params:
+          - id: mode
+            label: Wake mode
+            type: select
+            options: ["0=disable", "1=enable"]
+            default: "1=enable"
+          - id: sub_mode
+            label: Sub-mode
+            type: select
+            options: ["0=always wake", "1=on data only"]
+            default: "0=always wake"
+
+      - name: "AT+GTLPMMODE"
+        command: "AT+GTLPMMODE={mode},{submode}"
+        profiles: [nl668]
+        get: "AT+GTLPMMODE?"
+        caps: "AT+GTLPMMODE=?"
+        description: "Sleep control (FG160; not supported by FM160)"
+        params:
+          - id: mode
+            label: Control
+            type: select
+            options: ["0=ATS24", "1=WAKEUP pin"]
+            default: "0=ATS24"
+          - id: submode
+            label: Pin polarity (optional)
+            type: select
+            options: ["", "0=High sleeps", "1=Low sleeps"]
+            default: ""
+
+      - name: "AT+GTPMTIME"
+        command: "AT+GTPMTIME={delay_out}"
+        profiles: [nl668]
+        get: "AT+GTPMTIME?"
+        caps: "AT+GTPMTIME=?"
+        description: "Wake-up data delay in milliseconds (FM160/FG160)"
+        params:
+          - id: delay_out
+            label: Delay (ms)
+            default: "300"
+            hint: "100-1000 ms"
+
+  - name: "Network (GT)"
+    commands:
+      - name: "AT+GTCCINFO"
+        command: "AT+GTCCINFO?"
+        profiles: [fm350, fm160]
+        description: "Get current cell information (serving + neighbour cells)"
+
+      - name: "AT+GTCAINFO"
+        command: "AT+GTCAINFO?"
+        profiles: [fm350, fm160]
+        caps: "AT+GTCAINFO=?"
+        description: "Query Carrier Aggregation (CA) band combination info"
+
+      - name: "AT+GTCELLLOCK"
+        command: "AT+GTCELLLOCK={mode},{rat},{type},{earfcn},{pci},{scs},{nrband}"
+        profiles: [fm160]
+        get: "AT+GTCELLLOCK?"
+        caps: "AT+GTCELLLOCK=?"
+        description: "Cell/frequency lock (FM160/FG160); blank optional fields may be omitted"
+        params:
+          - id: mode
+            label: Lock mode
+            type: select
+            options: ["0=unlock", "1=lock"]
+            default: "0=unlock"
+          - id: rat
+            label: RAT (lock only)
+            type: select
+            options: ["", "0=LTE", "1=NR", "2=UMTS"]
+            default: ""
+          - id: type
+            label: Lock type (lock only)
+            type: select
+            options: ["", "0=PCI", "1=Frequency"]
+            default: ""
+          - id: earfcn
+            label: EARFCN / ARFCN
+            default: ""
+          - id: pci
+            label: PCI (optional)
+            default: ""
+          - id: scs
+            label: NR subcarrier spacing (optional)
+            default: ""
+            hint: "0=15 kHz, 1=30 kHz"
+          - id: nrband
+            label: NR band (optional)
+            default: ""
+            hint: "Module band encoding; check Caps and the module manual"
+
+      - name: "AT+GTCELLSCAN"
+        command: "AT+GTCELLSCAN"
+        profiles: [fm160]
+        description: "Scan frequencies and return neighbour cell information"
+
+      - name: "AT+GTPLMNLOCK"
+        command: "AT+GTPLMNLOCK={mode},{plmn}"
+        profiles: [fm160]
+        get: "AT+GTPLMNLOCK?"
+        caps: "AT+GTPLMNLOCK=?"
+        description: "Lock module to a specific PLMN (MCC+MNC)"
+        params:
+          - id: mode
+            label: Mode
+            type: select
+            options: ["0=unlock", "1=lock"]
+            default: "0=unlock"
+          - id: plmn
+            label: PLMN (MCC+MNC)
+            default: ""
+            hint: "e.g. 20801 for Orange FR"
+
+      - name: "AT+GTROAMCFG"
+        command: "AT+GTROAMCFG={n}"
+        profiles: [fm160]
+        get: "AT+GTROAMCFG?"
+        caps: "AT+GTROAMCFG=?"
+        description: "Roaming dial control (enable/disable data roaming)"
+        params:
+          - id: n
+            label: Roaming
+            type: select
+            options: ["0=disable roaming data", "1=enable roaming data"]
+            default: "1=enable roaming data"
+
+      - name: "AT+CEMODE"
+        command: "AT+CEMODE={mode}"
+        profiles: [fm350, fm160, nl668]
+        get: "AT+CEMODE?"
+        caps: "AT+CEMODE=?"
+        description: "UE mode of operation for EPS (PS-only or CS/PS)"
+        params:
+          - id: mode
+            label: Mode
+            type: select
+            options: ["0=PS mode 2", "1=CS/PS mode 1", "2=CS/PS mode 2", "3=PS mode 1"]
+            default: "2=CS/PS mode 2"
+
+  - name: "Hardware / IO"
+    commands:
+      - name: "AT+GTDIV"
+        command: "AT+GTDIV={rxdiv3G},{darp}"
+        profiles: [nl668]
+        get: "AT+GTDIV?"
+        caps: "AT+GTDIV=?"
+        description: "Set 3G receive diversity and DARP mode"
+        params:
+          - id: rxdiv3G
+            label: 3G RX diversity
+            type: select
+            options: ["0=disable", "1=enable"]
+            default: "1=enable"
+          - id: darp
+            label: DARP
+            type: select
+            options: ["0=disable", "1=enable"]
+            default: "0=disable"
+
+      - name: "AT+GTURCMODE"
+        command: "AT+GTURCMODE={report_flag}"
+        profiles: [fm160]
+        get: "AT+GTURCMODE?"
+        caps: "AT+GTURCMODE=?"
+        description: "Set URC (unsolicited result code) report mode"
+        params:
+          - id: report_flag
+            label: URC mode
+            type: select
+            options: ["0=disable URC", "1=enable URC"]
+            default: "1=enable URC"
+
+      - name: "AT+MMAD"
+        command: "AT+MMAD={channel}"
+        profiles: [g5g6]
+        description: "Query ADC channel voltage value"
+        params:
+          - id: channel
+            label: ADC channel
+            type: select
+            options: ["0", "1", "2", "3"]
+            default: "0"
+
+      - name: "AT+WRIM"
+        command: "AT+WRIM={event},{width}"
+        profiles: [g5g6, nl668]
+        get: "AT+WRIM?"
+        caps: "AT+WRIM=?"
+        description: "Set RI pulse width by event type (G5/G6, NL668)"
+        params:
+          - id: event
+            label: Event
+            type: select
+            options: ["0=Call", "1=SMS"]
+            default: "1=SMS"
+          - id: width
+            label: RI width (ms)
+            default: "120"
+            hint: "e.g. 120"
+
+      - name: "AT+GPIO"
+        command: "AT+GPIO={pin},{dir},{value}"
+        profiles: [nl668]
+        get: "AT+GPIO?"
+        description: "Set or read GPIO pin direction and value"
+        params:
+          - id: pin
+            label: GPIO pin number
+            default: "0"
+            hint: "Module-specific pin index"
+          - id: dir
+            label: Direction
+            type: select
+            options: ["0=input", "1=output"]
+            default: "1=output"
+          - id: value
+            label: Value (output only)
+            type: select
+            options: ["0=low", "1=high"]
+            default: "0=low"
+
+      - name: "AT+MTSM"
+        command: "AT+MTSM={report},{rate},{low},{high}"
+        profiles: [g5g6, nl668]
+        get: "AT+MTSM?"
+        caps: "AT+MTSM=?"
+        description: "Configure temperature reporting (G5/G6, NL668)"
+        params:
+          - id: report
+            label: Reporting
+            type: select
+            options: ["0=Disable reports", "1=Read once", "2=Periodic", "3=Outside thresholds"]
+            default: "1=Read once"
+          - id: rate
+            label: Period seconds (optional)
+            default: ""
+          - id: low
+            label: Low temperature (mode 3)
+            default: ""
+          - id: high
+            label: High temperature (mode 3)
+            default: ""
+
+      - name: "AT+MSMPD"
+        command: "AT+MSMPD={n}"
+        profiles: [fm350, g5g6, nl668]
+        get: "AT+MSMPD?"
+        description: "Enable or disable SIM card hot-plug detection"
+        params:
+          - id: n
+            label: Hot-plug
+            type: select
+            options: ["0=disable", "1=enable"]
+            default: "1=enable"
+
+  - name: "Data / IP (GT)"
+    commands:
+      - name: "AT+GTRNDIS"
+        command: "AT+GTRNDIS={status},{cid}"
+        profiles: [nl668]
+        get: "AT+GTRNDIS?"
+        caps: "AT+GTRNDIS=?"
+        description: "RNDIS interface enable/disable and PDP context binding"
+        params:
+          - id: status
+            label: Status
+            type: select
+            options: ["0=disable", "1=enable"]
+            default: "1=enable"
+          - id: cid
+            label: PDP CID
+            default: "1"
+
+      - name: "AT+GTAUTOCONNECT"
+        command: "AT+GTAUTOCONNECT={n}"
+        profiles: [fm160]
+        get: "AT+GTAUTOCONNECT?"
+        caps: "AT+GTAUTOCONNECT=?"
+        description: "Automatically activate PDP context on module start"
+        params:
+          - id: n
+            label: Auto-connect
+            type: select
+            options: ["0=disable", "1=enable"]
+            default: "0=disable"
+
+      - name: "AT+GTIPPASS"
+        command: "AT+GTIPPASS={state}"
+        profiles: [fm160]
+        get: "AT+GTIPPASS?"
+        caps: "AT+GTIPPASS=?"
+        description: "Enable IP pass-through mode (bridge mode)"
+        params:
+          - id: state
+            label: IP pass
+            type: select
+            options: ["0=disable", "1=enable"]
+            default: "0=disable"
+
+      - name: "AT+GTDNS"
+        command: "AT+GTDNS={cid}"
+        profiles: [fm350, fm160]
+        get: "AT+GTDNS?"
+        caps: "AT+GTDNS=?"
+        description: "Request DNS server addresses for a PDP context"
+        params:
+          - id: cid
+            label: PDP CID
+            default: "1"
+
+      - name: "AT+GTSTATIS"
+        command: "AT+GTSTATIS?"
+        profiles: [fm160]
+        caps: "AT+GTSTATIS=?"
+        description: "Query current transfer rate and total data volume statistics"
+
+      - name: "AT+GTPREDNSCFG"
+        command: 'AT+GTPREDNSCFG={mode},"{dns1}","{dns2}"'
+        profiles: [fm160]
+        get: "AT+GTPREDNSCFG?"
+        caps: "AT+GTPREDNSCFG=?"
+        description: "Pre-configure static DNS addresses"
+        params:
+          - id: mode
+            label: Static DNS
+            type: select
+            options: ["0=Disable", "1=Enable"]
+            default: "1=Enable"
+          - id: dns1
+            label: Primary DNS
+            default: "8.8.8.8"
+            hint: "e.g. 8.8.8.8"
+          - id: dns2
+            label: Secondary DNS
+            default: "8.8.4.4"
+            hint: "e.g. 8.8.4.4"
+
+      - name: "AT+GTWWAN"
+        command: "AT+GTWWAN={state},{cid}"
+        profiles: [fm160]
+        get: "AT+GTWWAN?"
+        caps: "AT+GTWWAN=?"
+        description: "Enable/disable ECM or RMNET for a defined PDP context (FM160/FG160)"
+        params:
+          - id: state
+            label: State
+            type: select
+            options: ["0=disable", "1=enable"]
+            default: "0=disable"
+          - id: cid
+            label: PDP context ID
+            default: "1"
+            hint: "Must already be defined with CGDCONT"
+
+      - name: "AT+GTAUTODHCP"
+        command: "AT+GTAUTODHCP={n}"
+        profiles: [fm160]
+        get: "AT+GTAUTODHCP?"
+        description: "ECM auto DHCP enable/disable"
+        params:
+          - id: n
+            label: Auto DHCP
+            type: select
+            options: ["0=disable", "1=enable"]
+            default: "1=enable"
+
+      - name: "AT+MGAUTH"
+        command: 'AT+MGAUTH={cid},{type},"{user}","{pwd}"'
+        profiles: [g5g6]
+        get: "AT+MGAUTH?"
+        caps: "AT+MGAUTH=?"
+        description: "Set PDP authentication (PAP/CHAP) for a context"
+        params:
+          - id: cid
+            label: PDP CID
+            default: "1"
+          - id: type
+            label: Auth type
+            type: select
+            options: ["0=none", "1=PAP", "2=CHAP"]
+            default: "0=none"
+          - id: user
+            label: Username
+            default: ""
+          - id: pwd
+            label: Password
+            default: ""
+
+  - name: USB & Interface
+    commands:
+      - name: USB mode capabilities
+        command: AT+GTUSBMODE=?
+        description: List USB compositions advertised by this firmware
+        profiles:
+        - fm350
+        - fm160
+      - name: RAT and band capabilities
+        command: AT+GTACT=?
+        description: List RAT and band values advertised by this firmware
+        profiles:
+        - fm350
+        - fm160

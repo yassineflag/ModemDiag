@@ -1,0 +1,15 @@
+name: Quectel certificate upload template
+description: "EC2x example. Paste a public CA certificate into Payload, choose its module filename, then enable the step. This uploads a file; configure the TLS profile separately."
+manufacturer: Quectel
+steps:
+  - command: 'AT+QFUPL="UFS:ca.pem",{length},60'
+    description: Upload the public CA certificate after CONNECT
+    enabled: false
+    prompt: CONNECT
+    payload: ''
+    payload_encoding: utf-8
+    payload_ending: none
+    expect: '+QFUPL:'
+    timeout_ms: 120000
+    on_failure: stop
+

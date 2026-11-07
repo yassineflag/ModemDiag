@@ -1,0 +1,115 @@
+name: "5G NR"
+description: "Verify 5G NR registration, signal quality, and cell info"
+icon: "📡"
+steps:
+  - command: "ATI"
+    description: "Module identification"
+    expect: "OK"
+    timeout_ms: 3000
+    delay_ms: 300
+
+  - command: "AT+CFUN?"
+    description: "Check functionality level"
+    expect: "+CFUN"
+    timeout_ms: 3000
+    delay_ms: 300
+
+  - command: "AT+CPIN?"
+    description: "SIM card status"
+    expect: "+CPIN"
+    expect_regex: '^\+CPIN:\s*READY\s*$'
+    timeout_ms: 3000
+    delay_ms: 300
+
+  - command: "AT+COPS?"
+    description: "Current operator and technology"
+    expect: "+COPS"
+    timeout_ms: 5000
+    delay_ms: 500
+
+  - command: "AT+C5GREG?"
+    description: "Read 5GS registration status"
+    expect: "+C5GREG"
+    expect_regex: '^\+C5GREG:\s*\d+\s*,\s*(?:1|5)(?:\s*,.*)?$'
+    timeout_ms: 5000
+    delay_ms: 500
+
+  - command: "AT+CEREG?"
+    description: "LTE EPS (fallback) registration status"
+    expect: "+CEREG"
+    expect_regex: '^\+CEREG:\s*\d+\s*,\s*(?:1|5)(?:\s*,.*)?$'
+    timeout_ms: 5000
+    delay_ms: 500
+
+  - command: "AT+CESQ"
+    description: "Read extended signal measurements supported by the modem"
+    expect: "+CESQ"
+    timeout_ms: 3000
+    delay_ms: 300
+
+  # ── Quectel ───────────────────────────────────────────────────────────────────
+  - command: 'AT+QENG="servingcell"'
+    description: "Serving cell engineering info"
+    manufacturer: "Quectel"
+    expect: "+QENG"
+    timeout_ms: 5000
+    delay_ms: 500
+    on_failure: continue
+
+  - command: "AT+QNWINFO"
+    description: "Network access type and band"
+    manufacturer: "Quectel"
+    expect: "+QNWINFO"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
+
+  - command: "AT+QCAINFO"
+    description: "Carrier aggregation information"
+    manufacturer: "Quectel"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
+
+  # ── Fibocom ───────────────────────────────────────────────────────────────────
+  - command: "AT+GTCCINFO?"
+    description: "Read serving and neighbour cells (FM160/FG160)"
+    manufacturer: "Fibocom"
+    expect: "+GTCCINFO:"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
+
+  - command: "AT+GTCAINFO?"
+    description: "Read carrier aggregation details (FM160/FG160)"
+    manufacturer: "Fibocom"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
+
+  - command: "AT+GTNRINFO"
+    description: "NR connection details on supporting firmware"
+    manufacturer: "Fibocom"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
+
+  # ── Sierra Wireless ───────────────────────────────────────────────────────────
+  - command: "AT!GSTATUS?"
+    description: "General radio status (RSSI, RSRP, bands)"
+    manufacturer: "Sierra Wireless"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
+
+  - command: "AT#NR5GINFO"
+    description: "NR connection details on supporting firmware"
+    manufacturer: "Telit"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue

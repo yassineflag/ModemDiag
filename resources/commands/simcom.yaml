@@ -1,0 +1,160 @@
+manufacturer: SIMCom
+color: '#29a6a6'
+profiles:
+  sim70x0: SIM7070 / SIM7080 / SIM7090
+include_3gpp: true
+references:
+- https://files.waveshare.com/upload/0/02/SIM7070_SIM7080_SIM7090_Series_AT_Command_Manual_V1.03.pdf
+categories:
+- name: Network
+  commands:
+  - name: AT+CNMP?
+    command: AT+CNMP?
+    description: Read preferred radio network mode
+    profiles: &id001
+    - sim70x0
+    caps: AT+CNMP=?
+  - name: AT+CMNB?
+    command: AT+CMNB?
+    description: Read LTE-M / NB-IoT preference
+    profiles: *id001
+    caps: AT+CMNB=?
+- name: Data / IP (GT)
+  commands:
+  - name: AT+CNCFG
+    command: AT+CNCFG={index},{ip_type},"{apn}"
+    description: Configure application context IP type and APN
+    profiles: *id001
+    params:
+    - id: index
+      label: Index
+      default: '0'
+    - id: ip_type
+      label: IP type
+      type: select
+      options:
+      - 0=Dual stack
+      - 1=IPv4
+      - 2=IPv6
+      default: 1=IPv4
+    - id: apn
+      label: Apn
+      default: internet
+    get: AT+CNCFG?
+    caps: AT+CNCFG=?
+  - name: AT+CNACT
+    command: AT+CNACT={index},{action}
+    description: Activate application context; inspect +APP PDP completion
+    profiles: *id001
+    params:
+    - id: index
+      label: Index
+      default: '0'
+    - id: action
+      label: Action
+      default: 1=Activate
+      type: select
+      options:
+      - 1=Activate
+      - 0=Deactivate
+      - 2=Auto activate
+    get: AT+CNACT?
+    caps: AT+CNACT=?
+- name: GNSS
+  commands:
+  - name: AT+CGNSPWR
+    command: AT+CGNSPWR={mode}
+    description: Control GNSS on equipped module variants
+    profiles: *id001
+    params:
+    - id: mode
+      label: Mode
+      default: 1=On
+      type: select
+      options:
+      - 1=On
+      - 0=Off
+    get: AT+CGNSPWR?
+    caps: AT+CGNSPWR=?
+  - name: AT+CGNSINF
+    command: AT+CGNSINF
+    description: Read GNSS fix and navigation data
+    profiles: *id001
+- name: MQTT
+  commands:
+  - name: AT+SMCONF
+    command: AT+SMCONF="URL","{host}",{port}
+    description: Configure MQTT broker endpoint
+    profiles: *id001
+    params:
+    - id: host
+      label: Host
+      default: example.test
+    - id: port
+      label: Port
+      default: '1883'
+    get: AT+SMCONF?
+  - name: MQTT client ID
+    command: AT+SMCONF="CLIENTID","{client}"
+    description: Configure MQTT client identity
+    profiles: *id001
+    params:
+    - id: client
+      label: Client
+      default: modemdiag
+  - name: AT+SMCONN
+    command: AT+SMCONN
+    description: Connect configured MQTT client
+    profiles: *id001
+  - name: AT+SMSTATE?
+    command: AT+SMSTATE?
+    description: Read MQTT connection state
+    profiles: *id001
+  - name: AT+SMPUB
+    command: AT+SMPUB="{topic}",{length},{qos},{retain}
+    description: Request MQTT payload input; use prompt/payload automation for exact bytes
+    profiles: *id001
+    params:
+    - id: topic
+      label: Topic
+      default: modemdiag/test
+    - id: length
+      label: Length
+      default: '5'
+    - id: qos
+      label: Qos
+      default: '0'
+    - id: retain
+      label: Retain
+      default: '0'
+    caps: AT+SMPUB=?
+  - name: AT+SMSUB
+    command: AT+SMSUB="{topic}",{qos}
+    description: Subscribe to a topic
+    profiles: *id001
+    params:
+    - id: topic
+      label: Topic
+      default: modemdiag/test
+    - id: qos
+      label: Qos
+      default: '0'
+  - name: AT+SMUNSUB
+    command: AT+SMUNSUB="{topic}"
+    description: Unsubscribe from a topic
+    profiles: *id001
+    params:
+    - id: topic
+      label: Topic
+      default: modemdiag/test
+  - name: AT+SMDISC
+    command: AT+SMDISC
+    description: Disconnect the MQTT session
+    profiles: *id001
+- name: SSL/TLS
+  commands:
+  - name: AT+SMSSL?
+    command: AT+SMSSL?
+    description: Read MQTT TLS selection; provisioning depends on firmware
+    profiles: *id001
+    caps: AT+SMSSL=?

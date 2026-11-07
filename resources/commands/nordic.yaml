@@ -1,0 +1,30 @@
+manufacturer: Nordic
+color: '#00a9ce'
+profiles:
+  nrf91: nRF91x1 AT client / modem firmware
+include_3gpp: true
+references:
+- https://docs.nordicsemi.com/r/bundle/ref_at_commands_nrf91x1/
+categories:
+- name: Status & Info
+  commands:
+  - name: AT%HWVERSION
+    command: AT%HWVERSION
+    description: Read modem hardware version
+    profiles: &id001
+    - nrf91
+  - name: AT%SHORTSWVER
+    command: AT%SHORTSWVER
+    description: Read short modem firmware version
+    profiles: *id001
+- name: Network
+  commands:
+  - name: AT%XMONITOR
+    command: AT%XMONITOR
+    description: Read network, cell, signal and power-saving information
+    profiles: *id001
+  - name: AT%XSYSTEMMODE?
+    command: AT%XSYSTEMMODE?
+    description: Read LTE-M / NB-IoT / GNSS system selection
+    profiles: *id001
+    caps: AT%XSYSTEMMODE=?
