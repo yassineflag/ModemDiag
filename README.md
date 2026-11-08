@@ -9,11 +9,28 @@ ModemDiag is a desktop app (Python + PyQt6) for talking to cellular modules over
 ModemDiag is an independent project. Manufacturer and product names identify compatibility; no vendor
 sponsorship, endorsement or certification is claimed. Trademarks belong to their respective owners.
 
-![ModemDiag — Fibocom selected with a simulated IoT data session](docs/fibocom.png)
+## Table of contents
 
-[View the light theme](docs/fibocom-light.png).
+- [Acknowledgements](#acknowledgements)
+- [Features](#features)
+- [Quick start (run from source)](#quick-start-run-from-source)
+- [Build a standalone executable](#build-a-standalone-executable)
+- [Release status](#release-status)
+- [Where user data is stored](#where-user-data-is-stored)
+- [Usage](#usage)
+- [Adding commands and test suites](#adding-commands-and-test-suites)
+- [Project structure](#project-structure)
+- [Disclaimer](#disclaimer)
+- [Feedback & contact](#feedback--contact)
+- [Author](#author)
+- [License](#license)
 
 ---
+
+## Acknowledgements
+
+Special thanks to **David Palma**, Director, IoT Technical Sales at **Fibocom**, and his team
+for their contributions and testing of ModemDiag.
 
 ## Features
 
@@ -32,6 +49,10 @@ sponsorship, endorsement or certification is claimed. Trademarks belong to their
 - **Appearance**: switch between dark and light colors using the theme button in the status bar; your choice is remembered locally.
 - **Licenses**: Help → Licenses shows licensing, warranty and support information, full release notices,
   and a link to matching source. Issues and licensing concerns can be reported through GitHub Issues.
+
+![ModemDiag — Fibocom selected with a simulated IoT data session](docs/fibocom.png)
+
+[View the light theme](docs/fibocom-light.png).
 
 ![ModemDiag — simulated Fibocom automation with per-step results](docs/automation.png)
 
