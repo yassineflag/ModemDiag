@@ -162,6 +162,22 @@ class AutomationPersistenceTests(unittest.TestCase):
                 self.assertIn(command, commands)
                 self.assertFalse(commands[command]["enabled"])
 
+    def test_generic_support_suites_run_without_configuration_writes_or_fixed_contexts(self):
+        root = Path(__file__).resolve().parents[1] / "resources"
+        files = [root / "diagnostics" / (name + ".yaml")
+                 for name in ("device_inventory", "data_session", "low_power", "network_reg")]
+        files.append(root / "macros/example_lte_check.yaml")
+        for file in files:
+            with self.subTest(file=file.name):
+                data = yaml.safe_load(file.read_text())
+                self.panel._load(data)
+                sent = []
+                self.panel.run_suite_requested.connect(sent.append)
+                self.panel._on_run()
+                self.assertTrue(sent)
+                self.assertFalse(any("=" in step["command"] for step in sent[-1]))
+                self.panel._on_stop()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -599,7 +599,7 @@ def project_files(root):
     """Explicit source allowlist: local settings, drafts and captures stay out."""
     root = Path(root)
     for name in ("main.py", "README.md", "LICENSE", ".gitignore", "requirements.txt", "build.sh", "build.bat",
-                 "release-policy.json", ".github/CONTRIBUTING.md", "docs/THIRD_PARTY_NOTICES.md"):
+                 "release-policy.json", ".github/CONTRIBUTING.md", "docs/THIRD_PARTY_NOTICES.md", "docs/CHANGELOG.md"):
         path = root / name
         if path.is_file() and not path.is_symlink():
             yield path
@@ -612,7 +612,9 @@ def project_files(root):
     for path in sorted((root / "resources" / "macros").glob("example_*.yaml")):
         if path.is_file() and not path.is_symlink():
             yield path
-    for name in ("fibocom.png", "fibocom-light.png", "automation.png"):
+    for name in ("fibocom.png", "fibocom-light.png", "automation.png", "automation-light.png",
+                 "dashboard.png", "dashboard-light.png", "ai-diag.png", "ai-diag-light.png",
+                 "updates.png", "updates-light.png"):
         path = root / "docs" / name
         if path.is_file():
             yield path
@@ -635,7 +637,51 @@ def clean_release_files(root=ROOT, keep=None):
 
 
 SOURCE_METADATA = ("sources.json", "requirements-release.txt", "project-files.json",
-                   "cryptography-sbom.json", "NOTICES.txt", "executable.sha256")
+                   "cryptography-sbom.json", "NOTICES.txt", "executable.sha256", "bundle-files.json")
+
+
+def record_bundle(metadata_dir, dist, executable, folder=None):
+    """Record the entire built application, including dependencies in folder builds."""
+    dist, executable = Path(dist), Path(executable)
+    files = sorted(Path(folder).rglob("*")) if folder else [executable]
+    records = {path.relative_to(dist).as_posix(): digest(path) for path in files if path.is_file()}
+    manifest = {"version": 1, "entrypoint": executable.relative_to(dist).as_posix(),
+                "folder": Path(folder).relative_to(dist).as_posix() if folder else None, "files": records}
+    (Path(metadata_dir) / "bundle-files.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    (Path(metadata_dir) / "executable.sha256").write_text(digest(executable) + "\n")
+
+
+def read_bundle(metadata_dir, dist):
+    """Resolve and verify the build inventory before packaging or signing."""
+    metadata_dir, dist = Path(metadata_dir), Path(dist)
+    path = metadata_dir / "bundle-files.json"
+    if not path.exists():
+        executable = dist / ("ModemDiag.exe" if sys.platform == "win32" else "ModemDiag")
+        return executable, [executable], None
+    manifest = json.loads(path.read_text())
+    if manifest.get("version") != 1 or not isinstance(manifest.get("files"), dict):
+        raise ValueError("Invalid application bundle inventory")
+    def safe_path(name):
+        relative = PurePosixPath(name)
+        if relative.is_absolute() or ".." in relative.parts or "\\" in name or ":" in name:
+            raise ValueError("Invalid bundle path")
+        resolved = dist / relative
+        if not resolved.resolve().is_relative_to(dist.resolve()):
+            raise ValueError("Bundle path leaves the distribution folder")
+        return resolved
+    executable = safe_path(manifest["entrypoint"])
+    folder = safe_path(manifest["folder"]) if manifest.get("folder") else None
+    files = [safe_path(name) for name in manifest["files"]]
+    if executable not in files or any(not path.is_file() for path in files):
+        raise ValueError("Application bundle is incomplete")
+    if folder:
+        actual = {path for path in folder.rglob("*") if path.is_file()}
+        if actual != set(files):
+            raise ValueError("Application bundle files changed since the build")
+    for name, expected in manifest["files"].items():
+        if digest(safe_path(name)) != expected:
+            raise ValueError(f"Application bundle changed since the build: {name}")
+    return executable, files, folder
 
 
 def write_source_zip(root, metadata_dirs, destination):
@@ -713,7 +759,8 @@ def package(root=ROOT):
         raise ValueError("Project files changed since the build; rebuild before packaging")
     version = project_version(root)
     label = f"ModemDiag-{version}-{platform_label()}"
-    executable = root / "local-ignored" / "dist" / ("ModemDiag.exe" if sys.platform == "win32" else "ModemDiag")
+    dist = root / "local-ignored" / "dist"
+    executable, bundle_files, _ = read_bundle(output, dist)
     if not executable.is_file():
         raise ValueError("Build the executable before packaging")
     if not (output / "sources.json").is_file():
@@ -729,9 +776,10 @@ def package(root=ROOT):
     try:
         write_source_zip(root, [output], source_temporary)
         with zipfile.ZipFile(temporary, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-            archive.write(executable, executable.name)
+            for path in bundle_files:
+                archive.write(path, path.relative_to(dist).as_posix())
             archive.write(output / "NOTICES.txt", "NOTICES.txt")
-            archive.comment = (f"SHA-256 {executable.name}: {digest(executable)}\n"
+            archive.comment = (f"SHA-256 {executable.relative_to(dist).as_posix()}: {digest(executable)}\n"
                                f"SHA-256 NOTICES.txt: {digest(output / 'NOTICES.txt')}\n").encode()
         source_temporary.replace(source_archive)
         temporary.replace(release)
@@ -739,7 +787,7 @@ def package(root=ROOT):
         temporary.unlink(missing_ok=True)
         source_temporary.unlink(missing_ok=True)
     clean_release_files(root, keep=release)
-    print(f"Binary: {release}\nContains: executable and NOTICES.txt.\n"
+    print(f"Binary: {release}\nContains: application bundle and NOTICES.txt.\n"
           f"Source: {source_archive}\nPublish both together; combine platform metadata before a multi-platform release.", flush=True)
 
 

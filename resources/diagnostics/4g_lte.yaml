@@ -53,9 +53,16 @@ steps:
     timeout_ms: 5000
     delay_ms: 300
 
-  - command: "AT+CGPADDR=1"
-    description: "IP address for PDP context 1"
-    expect: "+CGPADDR"
+  - command: "AT+CGACT?"
+    description: "Read activation states; context configuration alone does not mean active"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
+
+  - command: "AT+CGPADDR"
+    description: "Read addresses for all contexts; inspect for usable IPs"
+    expect: "OK"
     timeout_ms: 5000
     delay_ms: 300
     on_failure: continue

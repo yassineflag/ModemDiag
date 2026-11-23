@@ -49,3 +49,9 @@ def split_lines(raw: str) -> list[tuple[str, LineType]]:
     """
     lines  = raw.replace("\r\n", "\n").replace("\r", "\n").split("\n")
     return [(s, classify(s)) for line in lines if (s := line.strip())]
+
+
+def complete_lines(raw: str) -> tuple[str, str]:
+    """Separate complete CR, LF or CRLF lines from the unfinished final line."""
+    boundary = max(raw.rfind("\r"), raw.rfind("\n")) + 1
+    return raw[:boundary], raw[boundary:]

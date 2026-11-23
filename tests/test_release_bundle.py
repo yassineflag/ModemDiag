@@ -25,6 +25,7 @@ class ReleaseBundleTests(unittest.TestCase):
             "src/modemdiag/__init__.py": '__version__ = "1.0.1"',
             "src/modemdiag/app.py": "# application",
             "resources/macros/example_lte_check.yaml": "steps: []",
+            "docs/CHANGELOG.md": "# Progress fixture\n",
             "local-ignored/build/release/licenses/common/GPL-3": "GPL fixture",
             f"local-ignored/dist/{self.exe_name}": "executable fixture",
         }
@@ -70,6 +71,7 @@ class ReleaseBundleTests(unittest.TestCase):
         source_path = self.root / "local-ignored/dist/ModemDiag-1.0.1-source.zip"
         with zipfile.ZipFile(source_path) as source:
             self.assertIn("modemdiag/src/modemdiag/app.py", source.namelist())
+            self.assertIn("modemdiag/docs/CHANGELOG.md", source.namelist())
             manifest = json.loads(source.read("modemdiag/sources.json"))
             self.assertEqual(manifest["platforms"], [bundle.platform_label()])
             self.assertEqual(manifest["sources"], [{**self.record, "file": bundle.platform_label() + "/" + self.record["file"]}])
@@ -100,6 +102,39 @@ class ReleaseBundleTests(unittest.TestCase):
         snapshot = json.loads((extracted / "modemdiag/project-files.json").read_text())
         for name in ("windows-release-review.json", "windows-notices.txt", "requirements-release.txt"):
             self.assertEqual(snapshot[f"tools/build/windows-x64/{name}"], bundle.digest(bootstrap / name))
+
+    def test_folder_build_packages_and_checks_every_dependency(self):
+        dist = self.root / "local-ignored/dist"
+        folder = dist / "ModemDiag-app"
+        (folder / "_internal").mkdir(parents=True)
+        executable = folder / self.exe_name
+        executable.write_bytes(b"folder executable")
+        dependency = folder / "_internal/Qt6Core.dll"
+        dependency.write_bytes(b"dependency fixture")
+        bundle.record_bundle(self.metadata, dist, executable, folder)
+        bundle.package(self.root)
+        release = dist / f"ModemDiag-1.0.1-{bundle.platform_label()}.zip"
+        with zipfile.ZipFile(release) as archive:
+            self.assertEqual(set(archive.namelist()),
+                             {"ModemDiag-app/" + self.exe_name, "ModemDiag-app/_internal/Qt6Core.dll", "NOTICES.txt"})
+        dependency.write_bytes(b"unexpected change")
+        with self.assertRaisesRegex(ValueError, "changed since the build"):
+            bundle.package(self.root)
+
+    def test_folder_build_rejects_missing_or_injected_files(self):
+        dist = self.root / "local-ignored/dist"
+        folder = dist / "ModemDiag-app"
+        folder.mkdir()
+        executable = folder / self.exe_name
+        executable.write_bytes(b"folder executable")
+        bundle.record_bundle(self.metadata, dist, executable, folder)
+        (folder / "injected.dll").write_bytes(b"unexpected")
+        with self.assertRaisesRegex(ValueError, "changed since the build"):
+            bundle.package(self.root)
+        (folder / "injected.dll").unlink()
+        executable.unlink()
+        with self.assertRaisesRegex(ValueError, "incomplete"):
+            bundle.package(self.root)
 
     def other_platform_metadata(self):
         other = self.root / "other-platform"
@@ -235,7 +270,7 @@ class ReleaseBundleTests(unittest.TestCase):
         (self.root / "src/linked.py").symlink_to(self.root / ".env")
         selected = {path.relative_to(self.root).as_posix() for path in bundle.project_files(self.root)}
         self.assertEqual(selected, {"main.py", "README.md", "LICENSE", "src/modemdiag/__init__.py",
-                                    "src/modemdiag/app.py", "resources/macros/example_lte_check.yaml"})
+                                    "src/modemdiag/app.py", "resources/macros/example_lte_check.yaml", "docs/CHANGELOG.md"})
 
     def test_changed_application_files_require_a_rebuild(self):
         (self.root / "src/modemdiag/app.py").write_text("# changed after build")

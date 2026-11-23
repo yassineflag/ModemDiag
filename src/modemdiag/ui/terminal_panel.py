@@ -12,7 +12,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 from PyQt6.QtGui import QTextCursor, QKeyEvent, QFont, QAction
 
-from modemdiag.core.at_parser import split_lines, LineType
+from modemdiag.core.at_parser import split_lines, complete_lines, classify, LineType
 from modemdiag.ui.styles import COLOR
 
 
@@ -33,6 +33,8 @@ class TerminalPanel(QWidget):
         self._timestamps          = True
         self._autoscroll          = True
         self._last_tx: str        = ""
+        self._rx_pending = ""
+        self._partial_start = self._partial_end = None
         self._build_ui()
 
     # ── Build ──────────────────────────────────────────────────────────────────
@@ -118,8 +120,30 @@ class TerminalPanel(QWidget):
         self._append_html(html)
 
     def append_rx_raw(self, raw: str):
-        for line, kind in split_lines(raw):
+        if self._partial_start is not None:
+            cursor = QTextCursor(self._output.document())
+            cursor.setPosition(self._partial_start.position())
+            cursor.setPosition(self._partial_end.position(), QTextCursor.MoveMode.KeepAnchor)
+            cursor.removeSelectedText()
+            self._partial_start = self._partial_end = None
+        complete, self._rx_pending = complete_lines(self._rx_pending + raw)
+        for line, kind in split_lines(complete):
             self._append_rx_line(line, kind)
+        if self._rx_pending:
+            # Show prompts and unfinished responses immediately, then replace
+            # only that preview when the next USB chunk arrives.
+            self._partial_start = QTextCursor(self._output.document())
+            self._partial_start.movePosition(QTextCursor.MoveOperation.End)
+            self._partial_start.setKeepPositionOnInsert(True)
+            self._append_rx_line(self._rx_pending, classify(self._rx_pending), partial=True)
+            self._partial_end = QTextCursor(self._output.document())
+            self._partial_end.movePosition(QTextCursor.MoveOperation.End)
+            self._partial_end.setKeepPositionOnInsert(True)
+
+    def reset_rx_state(self):
+        self._rx_pending = ""
+        self._partial_start = self._partial_end = None
+        self._last_tx = ""
 
     def append_info(self, message: str):
         ts   = self._ts() if self._timestamps else ""
@@ -138,6 +162,7 @@ class TerminalPanel(QWidget):
         self._append_html(html)
 
     def clear(self):
+        self.reset_rx_state()
         self._output.clear()
 
     def set_input_enabled(self, enabled: bool):
@@ -146,11 +171,12 @@ class TerminalPanel(QWidget):
 
     # ── Internal ───────────────────────────────────────────────────────────────
 
-    def _append_rx_line(self, line: str, kind: LineType):
+    def _append_rx_line(self, line: str, kind: LineType, partial=False):
         # ATE1 echo: the modem mirrors the command back. It is not a response,
         # so consume it once and drop it — the command is already on screen.
         if self._last_tx and line.strip().upper() == self._last_tx.upper():
-            self._last_tx = ""
+            if not partial:
+                self._last_tx = ""
             return
 
         ts = self._ts() if self._timestamps else ""

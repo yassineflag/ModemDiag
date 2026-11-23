@@ -1,16 +1,10 @@
-name: "Network Registration"
-description: "Full network attach sequence and registration check"
+name: "Network Registration Snapshot"
+description: "Read current registration across network domains without changing radio settings. Unsupported domains may fail; a successful query alone does not mean registered."
 icon: "🌐"
 steps:
-  - command: "AT+CFUN=1"
-    description: "Set full functionality"
-    expect: "OK"
-    timeout_ms: 10000
-    delay_ms: 2000
-
-  - command: "AT+CMEE=2"
-    description: "Enable verbose error reporting"
-    expect: "OK"
+  - command: "AT+CFUN?"
+    description: "Read functionality level without enabling the radio"
+    expect: "+CFUN:"
     timeout_ms: 3000
     delay_ms: 300
 
@@ -30,28 +24,24 @@ steps:
   - command: "AT+CREG?"
     description: "CS (circuit-switched) registration"
     expect: "+CREG"
-    expect_regex: '^\+CREG:\s*\d+\s*,\s*(?:1|5)(?:\s*,.*)?$'
     timeout_ms: 5000
     delay_ms: 300
 
   - command: "AT+CGREG?"
     description: "GPRS registration"
     expect: "+CGREG"
-    expect_regex: '^\+CGREG:\s*\d+\s*,\s*(?:1|5)(?:\s*,.*)?$'
     timeout_ms: 5000
     delay_ms: 300
 
   - command: "AT+CEREG?"
     description: "EPS/LTE registration"
     expect: "+CEREG"
-    expect_regex: '^\+CEREG:\s*\d+\s*,\s*(?:1|5)(?:\s*,.*)?$'
     timeout_ms: 5000
     delay_ms: 300
 
   - command: "AT+C5GREG?"
     description: "5G NR registration"
     expect: "+C5GREG"
-    expect_regex: '^\+C5GREG:\s*\d+\s*,\s*(?:1|5)(?:\s*,.*)?$'
     timeout_ms: 5000
     delay_ms: 300
     on_failure: continue
@@ -68,6 +58,13 @@ steps:
     expect: "+CGDCONT"
     timeout_ms: 3000
     delay_ms: 300
+
+  - command: "AT+CGACT?"
+    description: "Read activation state of all defined contexts"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
 
   - command: "AT+CGPADDR"
     description: "IP addresses for all PDP contexts"

@@ -1,23 +1,17 @@
 name: "LTE Network Check"
-description: "Read LTE registration, signal quality and the context IP address"
+description: "Read-only LTE readiness check. Does not enable the radio or change echo/error settings. Inspect context states and addresses; a query passing does not verify Internet access."
 steps:
-  - command: "ATE0"
-    description: "Disable echo for clean output"
+  - command: "AT"
+    description: "Check AT interface is responding"
     expect: "OK"
     timeout_ms: 3000
     delay_ms: 200
 
-  - command: "AT+CMEE=2"
-    description: "Verbose error reporting"
-    expect: "OK"
+  - command: "AT+CFUN?"
+    description: "Check full functionality without changing it"
+    expect_regex: '^\+CFUN:\s*1(?:\s*,.*)?$'
     timeout_ms: 3000
-    delay_ms: 200
-
-  - command: "AT+CFUN=1"
-    description: "Ensure full functionality"
-    expect: "OK"
-    timeout_ms: 10000
-    delay_ms: 3000
+    delay_ms: 300
     on_failure: stop
 
   - command: "AT+CPIN?"
@@ -41,9 +35,16 @@ steps:
     timeout_ms: 3000
     delay_ms: 300
 
-  - command: "AT+CGPADDR=1"
-    description: "Read IP address"
-    expect: "+CGPADDR"
+  - command: "AT+CGACT?"
+    description: "Read activation states of all defined contexts"
+    expect: "OK"
+    timeout_ms: 5000
+    delay_ms: 300
+    on_failure: continue
+
+  - command: "AT+CGPADDR"
+    description: "Read addresses for all contexts"
+    expect: "OK"
     timeout_ms: 5000
     delay_ms: 300
     on_failure: continue

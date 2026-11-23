@@ -9,6 +9,7 @@ import threading
 from PyQt6.QtWidgets import (
     QWidget, QHBoxLayout, QLabel, QComboBox,
     QPushButton, QFrame, QToolButton, QCheckBox, QMessageBox,
+    QDialog, QDialogButtonBox, QFormLayout,
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 
@@ -36,6 +37,7 @@ class PortSelectorWidget(QWidget):
     # Internal: carries the auto-detect result from the worker thread back to
     # the GUI thread (a queued signal — QTimer can't be used from a plain thread)
     _auto_detect_done    = pyqtSignal(object)
+    ports_changed = pyqtSignal(list)
 
     BAUD_RATES   = ["9600", "19200", "38400", "57600", "115200",
                     "230400", "460800", "921600"]
@@ -61,6 +63,11 @@ class PortSelectorWidget(QWidget):
         self._known_types   = {}   # device → type string ('at', 'serial', …)
         self._detector      = None
         self._operation_allowed = lambda: True
+        self._serial_params = dict(bytesize=8, parity="N", stopbits=1, dtr=True, rts=True, line_ending="CR")
+        self._probing = False
+        self._closing = False
+        self._probe_generation = 0
+        self._port_user_selected = False
         self._build_ui()
         self._auto_detect_done.connect(self._on_auto_done)
         self._start_detector()
@@ -81,6 +88,8 @@ class PortSelectorWidget(QWidget):
         self._port_combo = QComboBox()
         self._port_combo.setEditable(True)
         self._port_combo.setMinimumWidth(240)
+        self._port_combo.activated.connect(lambda *_: setattr(self, "_port_user_selected", True))
+        self._port_combo.lineEdit().textEdited.connect(lambda *_: setattr(self, "_port_user_selected", True))
         set_tooltip(self._port_combo, "Select detected port or type any port manually\n"
             "(e.g. /dev/ttyUSB3 or COM5)")
         lay.addWidget(self._port_combo)
@@ -123,6 +132,12 @@ class PortSelectorWidget(QWidget):
         self._flow_combo.setMinimumWidth(90)
         lay.addWidget(self._flow_combo)
 
+        self._serial_btn = QPushButton("Serial…")
+        self._serial_btn.setObjectName("small")
+        self._serial_btn.setToolTip("Line ending (default CR), data bits, parity, stop bits, DTR and RTS")
+        self._serial_btn.clicked.connect(self._edit_serial_settings)
+        lay.addWidget(self._serial_btn)
+
         lay.addStretch()
 
         self._connect_btn = QPushButton("  Connect")
@@ -159,12 +174,18 @@ class PortSelectorWidget(QWidget):
 
     def shutdown(self):
         """Stop background port polling (call when the window closes)."""
+        self._closing = True
+        self._probe_generation += 1
         self._stop_detector()
+        if hasattr(self, "_timer"):
+            self._timer.stop()
 
     def _on_all_ports(self, ports: list):
         """Called every ~2 s by PortDetector with the full list of serial devices."""
+        self.ports_changed.emit(ports)
         if self._connected:
             return
+        previous_port = self.selected_port()
         prev = self._port_combo.currentText()
         self._port_combo.blockSignals(True)
         self._port_combo.clear()
@@ -183,7 +204,7 @@ class PortSelectorWidget(QWidget):
             self._port_combo.addItem(label, userData=dev)
 
         # Restore previous text (user may have typed something)
-        idx = self._port_combo.findText(prev)
+        idx = self._port_combo.findData(previous_port)
         if idx >= 0:
             self._port_combo.setCurrentIndex(idx)
         elif prev:
@@ -202,7 +223,7 @@ class PortSelectorWidget(QWidget):
         if at_port and not self._connected:
             current = self._port_combo.currentData() or self._port_combo.currentText()
             # Only auto-select if nothing useful is chosen yet
-            if not current or current not in self._known_types:
+            if not current or not self._port_user_selected:
                 idx = self._port_combo.findData(at_port)
                 if idx >= 0:
                     self._port_combo.setCurrentIndex(idx)
@@ -212,8 +233,9 @@ class PortSelectorWidget(QWidget):
     def _simple_refresh(self):
         import serial.tools.list_ports
         if self._connected:
+            self.ports_changed.emit([p.device for p in serial.tools.list_ports.comports()])
             return
-        prev = self._port_combo.currentData() or self._port_combo.currentText()
+        prev = self.selected_port()
         self._port_combo.blockSignals(True)
         self._port_combo.clear()
         for p in sorted(serial.tools.list_ports.comports(), key=lambda x: x.device):
@@ -258,11 +280,17 @@ class PortSelectorWidget(QWidget):
         self._connect_btn.style().unpolish(self._connect_btn)
         self._connect_btn.style().polish(self._connect_btn)
         for w in (self._port_combo, self._baud_combo, self._flow_combo,
-                  self._auto_btn, self._refresh_btn, self._usb_cb):
+                  self._auto_btn, self._refresh_btn, self._usb_cb, self._serial_btn):
             w.setEnabled(not connected)
 
     def selected_port(self) -> str:
-        return self._port_combo.currentData() or self._port_combo.currentText()
+        # Editable combos can retain itemData for the previous selection after
+        # the user types another port. Never open that stale port.
+        index = self._port_combo.currentIndex()
+        text = self._port_combo.currentText().strip()
+        if index >= 0 and text == self._port_combo.itemText(index):
+            return self._port_combo.itemData(index) or text
+        return text
 
     def set_operation_allowed(self, callback):
         self._operation_allowed = callback
@@ -271,7 +299,39 @@ class PortSelectorWidget(QWidget):
         return int(self._baud_combo.currentText())
 
     def selected_flow_params(self) -> dict:
-        return self.FLOW_OPTIONS[self._flow_combo.currentText()]
+        return {**self.FLOW_OPTIONS[self._flow_combo.currentText()], **self._serial_params}
+
+    def _edit_serial_settings(self):
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Serial settings")
+        layout = QFormLayout(dialog)
+        fields = {}
+        for key, title, values in (("line_ending", "Send line ending", ("CR", "CRLF", "LF")),
+                                   ("bytesize", "Data bits", (8, 7, 6, 5)),
+                                   ("parity", "Parity", ("N", "E", "O", "M", "S")),
+                                   ("stopbits", "Stop bits", (1, 1.5, 2))):
+            control = QComboBox()
+            for value in values:
+                control.addItem(str(value), value)
+            control.setCurrentIndex(control.findData(self._serial_params[key]))
+            layout.addRow(title, control)
+            fields[key] = control
+        for key in ("dtr", "rts"):
+            control = QCheckBox("Assert on open")
+            control.setChecked(self._serial_params[key])
+            layout.addRow(key.upper(), control)
+            fields[key] = control
+        note = QLabel("Match the working terminal's settings. Flow control is selected in the connection bar. "
+                      "Flow control can manage DTR/RTS; some drivers briefly assert these lines during open.")
+        note.setWordWrap(True)
+        layout.addRow(note)
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+        layout.addRow(buttons)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self._serial_params = {key: control.isChecked() if isinstance(control, QCheckBox) else control.currentData()
+                                   for key, control in fields.items()}
 
     def refresh_ports(self):
         self._manual_refresh()
@@ -283,7 +343,7 @@ class PortSelectorWidget(QWidget):
         self._manual_refresh()
 
     def _on_connect_clicked(self):
-        if not self._operation_allowed():
+        if not self._operation_allowed() or self._probing:
             return
         if self._connected:
             self.disconnect_requested.emit()
@@ -297,23 +357,38 @@ class PortSelectorWidget(QWidget):
                                         self.selected_flow_params())
 
     def _run_auto_detect(self):
-        if not self._operation_allowed():
+        if not self._operation_allowed() or self._connected or self._probing:
             return
+        self._probing = True
+        self._probe_generation += 1
+        generation = self._probe_generation
+        self._connect_btn.setEnabled(False)
         self._auto_btn.setEnabled(False)
         self._auto_btn.setText("Scanning…")
+        baud = self.selected_baud()
+        params = self.selected_flow_params()
 
         def _detect():
             from modemdiag.core.serial_manager import SerialManager
-            self._auto_detect_done.emit(SerialManager.auto_detect_at_port(self._operation_allowed))
+            allowed = lambda: not self._closing and generation == self._probe_generation and self._operation_allowed()
+            found = SerialManager.auto_detect_at_port(allowed, baud, **params)
+            if not self._closing:
+                self._auto_detect_done.emit((generation, found))
 
         threading.Thread(target=_detect, daemon=True).start()
 
-    def _on_auto_done(self, found: str | None):
+    def _on_auto_done(self, result):
+        generation, found = result
+        if self._closing or generation != self._probe_generation:
+            return
+        self._probing = False
+        self._connect_btn.setEnabled(True)
         self._auto_btn.setEnabled(True)
         self._auto_btn.setText("Auto-Detect")
         if not self._operation_allowed():
             return
         if found:
+            self._port_user_selected = True
             idx = self._port_combo.findData(found)
             if idx >= 0:
                 self._port_combo.setCurrentIndex(idx)

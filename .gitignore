@@ -25,9 +25,17 @@ quick_send.yaml
 user_commands.yaml
 release-policy-cache.json
 appearance.json
+ai-settings.json
+
+# Personal configuration exports can contain command credentials
+ModemDiag-configuration*.zip
 # Defense in depth: the signing tool also refuses keys inside this repository.
 *.pem
 *.key
+*.p12
+*.pfx
+*.jks
+*.keystore
 *.pdf
 
 # Legacy custom automations; the public example is now in resources/macros/.

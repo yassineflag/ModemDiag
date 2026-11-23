@@ -62,7 +62,12 @@ fi
 
 echo ""
 echo "✓ Build complete!"
-echo "  Executable : $(pwd)/local-ignored/dist/ModemDiag"
+if [ "${MODEMDIAG_BUNDLE_MODE:-onefile}" = onedir ]; then
+    echo "  Executable : $(pwd)/local-ignored/dist/ModemDiag-app/ModemDiag"
+    echo "  Keep the entire ModemDiag-app folder together, including _internal."
+else
+    echo "  Executable : $(pwd)/local-ignored/dist/ModemDiag"
+fi
 if [ "$MODEMDIAG_RELEASE" = 1 ]; then
     echo "  Release    : binary ZIP plus separate source ZIP in local-ignored/dist/"
     echo "  Multi-platform release: combine both builds' metadata as described in README.md."

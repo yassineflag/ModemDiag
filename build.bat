@@ -12,6 +12,7 @@ set "PYTHONPYCACHEPREFIX=%CD%\local-ignored\cache\pycache"
 
 echo === ModemDiag Windows Build ===
 set MODEMDIAG_RELEASE=1
+if not defined MODEMDIAG_BUNDLE_MODE set "MODEMDIAG_BUNDLE_MODE=onedir"
 if "%~1"=="--dev" set MODEMDIAG_RELEASE=0
 if not "%~1"=="" if not "%~1"=="--release" if not "%~1"=="--dev" (
     echo Usage: build.bat [--release ^| --dev]
@@ -87,7 +88,11 @@ if errorlevel 1 (
     goto :FAILED
 )
 
-:: 6. Package separate binary and source ZIPs
+:: 6. Sign with an existing trusted certificate if configured, then package.
+python tools\windows_sign.py
+if errorlevel 1 goto :FAILED
+
+:: Package separate binary and source ZIPs
 if "%MODEMDIAG_RELEASE%"=="1" (
     python tools\release_bundle.py package
     if errorlevel 1 goto :FAILED
@@ -99,7 +104,12 @@ if "%MODEMDIAG_RELEASE%"=="1" (
 :: 7. Done
 echo.
 echo [OK] Build complete!
-echo     Executable: %cd%\local-ignored\dist\ModemDiag.exe
+if "%MODEMDIAG_BUNDLE_MODE%"=="onedir" (
+    echo     Executable: %cd%\local-ignored\dist\ModemDiag-app\ModemDiag.exe
+    echo     Keep the entire ModemDiag-app folder together, including _internal.
+) else (
+    echo     Executable: %cd%\local-ignored\dist\ModemDiag.exe
+)
 if "%MODEMDIAG_RELEASE%"=="1" echo     Release: binary ZIP plus separate source ZIP in local-ignored\dist
 if "%MODEMDIAG_RELEASE%"=="1" echo     Combine both platforms' metadata for a multi-platform release; see README.md
 echo     User data : %APPDATA%\ModemDiag\

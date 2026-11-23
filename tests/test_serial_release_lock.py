@@ -47,17 +47,17 @@ class SerialReleaseLockTests(unittest.TestCase):
                 patch("modemdiag.core.serial_manager.serial.Serial") as port:
             allowed = Mock(side_effect=[True, True, False])
             self.assertIsNone(SerialManager.auto_detect_at_port(allowed))
-        port.return_value.__enter__.return_value.write.assert_not_called()
+        port.return_value.write.assert_not_called()
 
     def test_noncellular_at_module_can_be_detected_without_ati_support(self):
         with patch.object(SerialManager, 'list_ports', return_value=[{'device':'COM7'}]), \
                 patch('modemdiag.core.serial_manager.serial.Serial') as port, \
                 patch('modemdiag.core.serial_manager.time.sleep'):
-            peer = port.return_value.__enter__.return_value
+            peer = port.return_value
             peer.in_waiting = 7
             peer.read.side_effect = [b'ERROR\r\n', b'OK\r\n']
             self.assertEqual(SerialManager.auto_detect_at_port(), 'COM7')
-            self.assertEqual([c.args[0] for c in peer.write.call_args_list], [b'ATI\r\n', b'AT\r\n'])
+            self.assertEqual([c.args[0] for c in peer.write.call_args_list], [b'ATI\r', b'AT\r'])
 
 
 if __name__ == "__main__":

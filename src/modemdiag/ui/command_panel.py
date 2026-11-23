@@ -14,6 +14,7 @@ from pathlib import Path
 import tempfile
 from string import Formatter
 import yaml
+from modemdiag.core.yaml_utils import safe_load
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QSplitter,
     QListWidget, QListWidgetItem, QStackedWidget, QScrollArea,
@@ -95,7 +96,7 @@ def _load_yaml(filename: str) -> dict:
     if not os.path.exists(path):
         return {}
     with open(path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
+        return safe_load(f) or {}
 
 
 def _build_cat_map(data: dict) -> dict:
@@ -109,7 +110,7 @@ def _load_user() -> dict:
     if not os.path.exists(USER_FILE):
         return {"added": [], "removed": []}
     with open(USER_FILE, "r", encoding="utf-8") as f:
-        d = yaml.safe_load(f) or {}
+        d = safe_load(f) or {}
     d.setdefault("added",   [])
     d.setdefault("removed", [])
     return d
@@ -138,7 +139,7 @@ def _load_favorites() -> list:
     if os.path.exists(FAVORITES_FILE):
         try:
             with open(FAVORITES_FILE, "r", encoding="utf-8") as f:
-                d = yaml.safe_load(f) or []
+                d = safe_load(f) or []
             if isinstance(d, list):
                 return d
         except Exception:
@@ -181,6 +182,10 @@ class CommandPanel(QWidget):
 
     def _recover_legacy_parameters(self):
         """Recover schemas discarded by older versions when only labels were edited."""
+        if not any(not entry.get("params") and any(
+                r.get("function") == entry.get("function") and r.get("command") == entry.get("command")
+                for r in self._user.get("removed", [])) for entry in self._user.get("added", [])):
+            return
         libraries = [self._3gpp] + [_build_cat_map(_load_yaml(filename))
                                    for filename in MANUFACTURER_FILES.values() if filename]
         for entry in self._user.get("added", []):
@@ -279,6 +284,16 @@ class CommandPanel(QWidget):
         self._cat_list.setCurrentRow(row)
         self._param_bar.hide()
         self._on_search(self._search_box.text())
+
+    def reload_configuration(self):
+        """Apply imported files and discard undo history from the old library."""
+        self._user = _load_user()
+        self._recover_legacy_parameters()
+        self._undo.clear()
+        self._redo.clear()
+        self._saved_state = self._snapshot()
+        self._refresh_structure()
+        self._update_history_actions()
 
     def reset_defaults(self):
         answer = QMessageBox.question(

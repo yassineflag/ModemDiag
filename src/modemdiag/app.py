@@ -5,19 +5,32 @@ Copyright (c) 2026 Yassine El Harami — MIT License
 """
 import sys
 
-from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QFont
+from PyQt6.QtWidgets import QApplication, QSplashScreen
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QFont, QPixmap, QPainter, QColor
 from modemdiag import __version__
 
 
 def main():
     # Qt 6 enables HiDPI scaling by default — nothing to configure here
     app = QApplication(sys.argv)
-
-    from modemdiag.ui.main_window import MainWindow
     app.setApplicationName("ModemDiag")
     app.setApplicationVersion(__version__)
     app.setOrganizationName("ModemDiag")
+
+    pixmap = QPixmap(420, 150)
+    pixmap.fill(QColor("#161b22"))
+    painter = QPainter(pixmap)
+    painter.setPen(QColor("#58a6ff"))
+    painter.setFont(QFont("Segoe UI", 23, QFont.Weight.Bold))
+    painter.drawText(pixmap.rect().adjusted(0, 0, 0, -35), Qt.AlignmentFlag.AlignCenter, "ModemDiag")
+    painter.end()
+    splash = QSplashScreen(pixmap)
+    splash.showMessage("Loading interface…", Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignHCenter, QColor("#e6edf3"))
+    splash.show()
+    app.processEvents()
+
+    from modemdiag.ui.main_window import MainWindow
 
     # Apply dark theme before any window is created
     from modemdiag.ui.styles import DARK_THEME
@@ -28,8 +41,11 @@ def main():
     font.setPointSize(10)
     app.setFont(font)
 
-    window = MainWindow()
-    window.show()
+    try:
+        window = MainWindow()
+        window.show()
+    finally:
+        splash.close()
 
     sys.exit(app.exec())
 

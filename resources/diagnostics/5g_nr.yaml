@@ -1,5 +1,5 @@
 name: "5G NR"
-description: "Verify 5G NR registration, signal quality, and cell info"
+description: "Check 5GS registration (standalone), signal quality and vendor cell info. NSA may report only EPS registration; EPS registration is not required for standalone 5G."
 icon: "📡"
 steps:
   - command: "ATI"
@@ -35,9 +35,8 @@ steps:
     delay_ms: 500
 
   - command: "AT+CEREG?"
-    description: "LTE EPS (fallback) registration status"
+    description: "Read LTE EPS status; standalone 5G may report unregistered"
     expect: "+CEREG"
-    expect_regex: '^\+CEREG:\s*\d+\s*,\s*(?:1|5)(?:\s*,.*)?$'
     timeout_ms: 5000
     delay_ms: 500
 

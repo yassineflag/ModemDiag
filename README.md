@@ -1,10 +1,12 @@
 # ModemDiag
 
-Version **1.1**
+Version **1.2**
+
+See the [1.2 progress and verification record](docs/CHANGELOG.md) for completed work and outstanding Windows/hardware checks.
 
 **An open-source AT command tester and diagnostic tool for cellular modems (LTE / 5G / NB-IoT / GNSS).**
 
-ModemDiag is a desktop app (Python + PyQt6) for talking to cellular modules over a serial port. It gives you a colour-coded AT terminal, a library of one-click commands for the major module vendors, and an automation engine that runs scripted test sequences and reports pass/fail for each step.
+ModemDiag is a desktop app (Python + PyQt6) for talking to cellular modules over a serial port. It gives you a network dashboard, a colour-coded AT terminal, a library of one-click commands for the major module vendors, and an automation engine that runs scripted test sequences and reports pass/fail for each step.
 
 ModemDiag is an independent project. Manufacturer and product names identify compatibility; no vendor
 sponsorship, endorsement or certification is claimed. Trademarks belong to their respective owners.
@@ -35,6 +37,7 @@ for their contributions and testing of ModemDiag.
 ## Features
 
 - **Smart port detection**: polls for USB modems and labels each port by role (`AT`, `PPP`, `NMEA`, `DM`) using sysfs on Linux and the registry on Windows. The AT port is selected automatically, and an *Auto-Detect* button probes ports with `ATI`.
+- **Dashboard**: a full-width radio overview with an interactive serving/neighbour cell diagram, signal history, operator/PLMN, bands, channel, duplex and RRC state where reported. Includes RSSI/RSRP/RSRQ/SINR, SIM and CS/PS/LTE/5G/IMS registration, APN/IP data contexts and a session event feed. Click **Refresh** or enable **Live · 10 s**; **Terminal** opens the AT traffic beside the dashboard. Missing information is labelled **Not reported**.
 - **AT terminal**: colour-coded output (OK / ERROR / URC / data), timestamps, command history (↑ / ↓), and the modem's echo is hidden.
 - **Command library**: 380+ entries grouped by function (Identity, SIM, Network, Data, TCP/IP, PSM/NTN, GNSS, SMS, Calls, IoT/Cloud, …)
   - 3GPP commands (blue) plus vendor-specific commands (amber) for **Quectel, Fibocom, Sierra Wireless, u-blox, Telit, SIMCom, Nordic and Espressif ESP-AT**
@@ -44,19 +47,27 @@ for their contributions and testing of ModemDiag.
   - Undo/redo command-library changes during the current session; edits keep descriptions and parameter controls
   - Add a vendor with **+** beside the vendor selector; new commands belong to the selected vendor
 - **Automation**: build sequences with substring or regex expectations, completion/failure URCs, prompt-driven text or hex payloads, timeouts, delays and failure policies (`continue` / `stop` / `retry`). Ships with suites for LTE, 5G NR, SIM, network registration, GNSS and Fibocom MA510 TCP/UDP, plus configurable MQTT, certificate-upload and ESP-AT payload templates. Suites can be imported and exported as YAML.
-- **Session logs**: every TX/RX line is written to a timestamped log file (*File → Save Log…*).
-- **Cross-platform**: Linux and Windows, with a single-file executable built by PyInstaller.
+- **AI Diag ★ Beta**: the fourth tab connects to OpenAI or an OpenAI-compatible/local API for diagnostic chat, reviewed command plans and bounded automatic read queries. Preview the shared modem context, run selected steps and send their results back for analysis. API keys and conversations stay in memory; provider/model preferences are saved locally.
+- **Session logs**: traffic, payloads and step results are saved continuously. The status bar and Session menu control recording; *File → Save Log…* exports a copy.
+- **Configuration transfer**: export/import a ZIP containing saved commands, favorites, automations, theme and AI preferences, with a backup before import.
+- **Cross-platform**: Linux and Windows, with PyInstaller builds. Windows defaults to a folder bundle for faster startup; Linux defaults to a single executable.
 - **Appearance**: switch between dark and light colors using the theme button in the status bar; your choice is remembered locally.
 - **Licenses**: Help → Licenses shows licensing, warranty and support information, full release notices,
   and a link to matching source. Issues and licensing concerns can be reported through GitHub Issues.
 
-![ModemDiag — Fibocom selected with a simulated IoT data session](docs/fibocom.png)
+![ModemDiag — interactive cell landscape and LTE / 5G NSA signal history](docs/dashboard.png)
+
+[View the dashboard in the light theme](docs/dashboard-light.png).
+
+![ModemDiag — Fibocom IoT data-session example](docs/fibocom.png)
 
 [View the light theme](docs/fibocom-light.png).
 
-![ModemDiag — simulated Fibocom automation with per-step results](docs/automation.png)
+![ModemDiag — Fibocom automation with per-step results](docs/automation.png)
 
-<sub>Screenshots show a simulated session with sample data, not a capture from real hardware.</sub>
+[Preview AI Diag ★ Beta](docs/ai-diag.png) · [Light theme](docs/ai-diag-light.png).
+
+<sub>Screenshots illustrate the interface and example workflows.</sub>
 
 ## Quick start (run from source)
 
@@ -89,20 +100,32 @@ collect installed license notices locally without downloading dependency sources
 | Platform | Command | Output |
 |---|---|---|
 | Linux | `chmod +x build.sh && ./build.sh` | `local-ignored/dist/ModemDiag` |
-| Windows | Double-click `build.bat` | Executable and release ZIPs in `local-ignored\dist\` |
+| Windows | Double-click `build.bat` | `local-ignored\dist\ModemDiag-app\ModemDiag.exe` and release ZIPs |
+
+Windows builds now use a folder bundle to avoid extracting Python and Qt on every launch.
+Extract the complete binary ZIP before running `ModemDiag-app\ModemDiag.exe`; keep the `_internal`
+folder alongside it. Do not copy just the executable or run it directly from inside the ZIP.
+For an optional single-file Windows build, set `MODEMDIAG_BUNDLE_MODE=onefile` before running
+`build.bat`. Linux keeps a single-file default; `MODEMDIAG_BUNDLE_MODE=onedir ./build.sh` uses the
+same faster folder layout at `local-ignored/dist/ModemDiag-app/ModemDiag`.
+
+The application shows a loading window while its interface initializes. Safe YAML loading uses
+PyYAML's C extension where available, and unneeded legacy command-library scans are skipped.
+The single-file format still has an extraction phase before the loading window can appear.
 
 For distribution, run `./build.sh --release` on Linux or `build.bat` on Windows
 (`build.bat --release` remains supported). Each release build creates a
-binary ZIP and a separate source ZIP in `local-ignored/dist/`. Binary ZIPs contain only the executable
-and `NOTICES.txt`, with their SHA-256 checksums recorded in the ZIP comment. The source ZIP contains
+binary ZIP and a separate source ZIP in `local-ignored/dist/`. Binary ZIPs contain the application
+bundle and `NOTICES.txt`, with the executable and notices SHA-256 checksums recorded in the ZIP comment.
+Folder builds record and check all bundled files before packaging. The source ZIP contains
 matching application files once, plus each included platform's build requirements, notices and
 dependency-source records under `modemdiag/release/<platform>/`.
 
 For a Linux x86_64 and Windows x64 release, publish exactly these three downloads together:
 
-- `ModemDiag-1.1-linux-x86_64.zip`
-- `ModemDiag-1.1-windows-x64.zip`
-- `ModemDiag-1.1-source.zip`
+- `ModemDiag-1.2-linux-x86_64.zip`
+- `ModemDiag-1.2-windows-x64.zip`
+- `ModemDiag-1.2-source.zip`
 
 A single-platform build initially puts only that platform's records in its source ZIP. To prepare
 the shared source ZIP, first save/extract each platform's generated source ZIP in a separate ignored
@@ -126,7 +149,64 @@ The first release build downloads dependency sources to collect their notices; l
 `local-ignored/cache/`. They are not copied into the release ZIP. Set `MODEMDIAG_SOURCE_CACHE` to choose the
 cache location. Release files and downloaded sources stay outside Git.
 
-The result is a single self-contained file, so the target machine doesn't need Python. PyInstaller doesn't cross-compile: build the Windows `.exe` on Windows and the Linux binary on Linux.
+Both formats include Python and dependencies, so the target machine doesn't need Python installed.
+PyInstaller doesn't cross-compile: build the Windows `.exe` on Windows and the Linux binary on Linux.
+
+### Windows publisher trust and signing
+
+The blue **Windows protected your PC** warning is usually Microsoft Defender SmartScreen's
+publisher/file reputation check. It is different from Defender reporting a named malware detection.
+An unsigned build has no verified publisher identity. A loading screen, file version, checksum,
+or switching bundle formats cannot establish that identity or guarantee removal of the warning.
+
+For public releases, use a trusted code-signing identity consistently (a certificate with access to
+its private key in the Windows certificate store, or a separately configured signing service).
+New signed releases may still prompt until reputation accumulates; EV certificates do not provide
+an immediate SmartScreen bypass. Microsoft Store MSIX distribution is another option, but this
+repository does not yet build or publish a Store package. See Microsoft's
+[code-signing options](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/code-signing-options)
+and [SmartScreen guidance](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/smartscreen-reputation).
+
+**No-cost distribution options:** a paid certificate is not required to pursue either of these routes.
+
+- **Microsoft Store with MSIX:** Microsoft provides signing after package certification. The current
+  [developer registration flow](https://learn.microsoft.com/en-us/windows/apps/publish/partner-center/open-a-developer-account)
+  has no registration fee; account/identity verification and Store review are still required.
+  The free signing applies to Store-distributed MSIX packages, not an EXE uploaded to GitHub or a
+  traditional EXE/MSI Store submission. This repository does not yet prepare a Store package.
+- **SignPath Foundation:** offers [free signing for qualifying open-source projects](https://signpath.org/terms).
+  This is a potential route for keeping downloadable Windows binaries on GitHub. Approval is required,
+  along with verified build provenance, a public signing policy, maintainer MFA and release approvals.
+  ModemDiag has not been accepted into the program, and no SignPath pipeline is configured yet.
+  Signing establishes publisher identity; it does not guarantee immediate SmartScreen reputation.
+
+For GitHub downloads, investigate SignPath eligibility first. For Store installation, use the MSIX
+route so Microsoft handles signing. C/C++, Java and packaged PowerShell applications do not receive
+a general exemption from downloaded-file reputation checks. A locally built executable and a newly
+downloaded release can therefore behave differently even when they contain the same application.
+
+The Windows build can sign with an existing certificate in **Current User → Personal** using
+Windows SDK SignTool. In `cmd.exe`, set:
+
+```bat
+set "MODEMDIAG_SIGN_CERT_SHA1=YOUR_40_HEX_CHARACTER_CERTIFICATE_THUMBPRINT"
+set "MODEMDIAG_TIMESTAMP_URL=http://timestamp.digicert.com"
+set "MODEMDIAG_REQUIRE_SIGNING=1"
+build.bat
+```
+
+Use your certificate provider's RFC 3161 timestamp URL; the URL above is
+[DigiCert's documented service](https://knowledge.digicert.com/solution/troubleshooting-timestamping-problems).
+If SignTool is not on PATH, set `MODEMDIAG_SIGNTOOL` to its full path. The build signs with SHA-256,
+timestamps, verifies Authenticode trust, then records the signed bytes before creating release ZIPs.
+It stops on signing/verification failure. No key or password is stored in the repository. Without
+credentials it explicitly reports an **UNSIGNED build**; set `MODEMDIAG_REQUIRE_SIGNING=1` to prevent
+an unsigned release. Signing-service integration and a trusted identity must be configured separately.
+The signed release-policy JSON already used by ModemDiag does not sign the Windows executable.
+
+If Defender reports an actual threat name, retain the exact detection and file hash and submit the
+specific build to Microsoft's file-submission service for analysis. Do not treat all security
+warnings as SmartScreen or ask users to disable their protection.
 
 <details>
 <summary>Maintainers: Windows native dependency review</summary>
@@ -181,8 +261,14 @@ unless a previously accepted policy revoked this version. Revocation stops autom
 the modem and blocks modem operations; editing and saving remain available. A newer policy can
 restore access without reconnecting automatically. Update notices alone do not block commands.
 **View releases** opens the official download page; installation is manual.
-**Help → Release status…** shows the current decision. No AT traffic, logs or device identifiers
-are uploaded; GitHub receives the normal HTTPS request, including its source IP address.
+**Help → Updates…** shows the installed version and available update information. **Show Details**
+contains the technical status and privacy explanation. **Check for updates now** requests an
+immediate check. Automatic checks and signed release restrictions are unchanged.
+[Preview the compact Updates dialog](docs/updates.png).
+No AT traffic, logs or device identifiers are uploaded. GitHub receives ordinary HTTPS connection
+information, including the source IP address, under its
+[privacy policy](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
+ModemDiag does not add an IP-address field to the request or collect it as application telemetry.
 Older builds without the checker cannot be remotely disabled, and modified clients can bypass it.
 
 <details>
@@ -199,7 +285,7 @@ python3 tools/release_policy.py sign --key /private/path/release-signing.pem --s
 ```
 
 To announce a published update without blocking users, sign with `--latest-version X.Y[.Z]` (stable
-two- or three-part versions only). For example, `--sequence 4 --latest-version 1.1.0` shows an update notice on older
+two- or three-part versions only). For example, `--sequence 4 --latest-version 1.2` shows an update notice on older
 versions. Add `--update-message "Your short release note"` if useful. Combine that announcement with
 `--revoke 1.0.0` when that particular release must stop operating. Without a custom revocation message,
 blocked users see “This version is no longer supported. Please update ModemDiag.” Only advertise a
@@ -218,13 +304,41 @@ releases distinct version numbers. Replacing the pinned signing key requires dis
 
 | | Running from source | Packaged executable |
 |---|---|---|
-| Favourites, custom commands, your automations, logs | `local-ignored/runtime/` | Linux: `~/.local/share/ModemDiag/`<br>Windows: `%APPDATA%\ModemDiag\` |
+| Favourites, custom commands, your automations, logs | `local-ignored/runtime/` | Linux: `~/.local/share/ModemDiag/` (or `$XDG_DATA_HOME/ModemDiag/`)<br>Windows: `%APPDATA%\ModemDiag\`<br>macOS: `~/Library/Application Support/ModemDiag/` |
 
 Updating or replacing the executable never deletes your customisations.
 
 Open **Settings → Configuration location…** to see the exact folder used by your installation. Command edits, custom vendors and category layout are in `user_commands.yaml`; favourites are in `quick_send.yaml`. Changes are saved automatically. Green commands are user-added or edited commands.
 
 The dark/light theme preference is stored separately in `appearance.json` in the same folder.
+AI provider, model and API URL preferences use `ai-settings.json`; API keys and chats are not saved.
+
+To back up your settings or move to another PC:
+
+1. Save any automation edits, then choose **Settings → Export configuration…** to create a ZIP file.
+2. Copy the ZIP to the other PC and choose **Settings → Import configuration…** there, with the modem disconnected.
+3. Review the file list and confirm. Commands, favourites, saved automations, theme and AI preferences apply immediately.
+
+Import replaces files included in the archive and keeps other local files. Before importing, ModemDiag
+saves the previous configuration under `backups/before_import_*.zip` in the user data folder; use Import
+configuration to recover those saved settings. Restoring a backup does not delete newly added files.
+Archives exclude session logs, AI API keys, chats and release-policy caches. Custom commands and
+automations may contain credentials, so keep exported archives private. Nothing is uploaded to a server.
+This transfers the application's command library; modem settings changed by sending AT commands
+are stored by the modem according to its firmware and are not captured by a configuration export.
+
+Installed executable updates use the same OS user data folder. Source checkouts each have their own
+`local-ignored/runtime/`; export before replacing or moving a checkout. **Settings → Open configuration
+folder** opens the exact location for manual backups.
+
+Every modem connection starts continuous logging automatically. The status bar's **● Logging** button
+shows recording state and its tooltip gives the file path; click it to stop or resume with a new file.
+**Session → Start new log**, **Stop logging** and **Open logs folder** provide the same controls and access
+to files. Each traffic record and step result is flushed as it happens; an application crash does not
+require a final Save. A sudden power/OS failure or traffic not yet processed can still lose data.
+RX chunks use quoted text with escaped `\r`/`\n`, preserving partial lines and whitespace. Sent payloads
+are recorded as hex bytes. Disk errors visibly stop logging while modem work continues; retry with
+Start new log. **File → Save Log…** copies the current/last recorded file to a chosen location.
 
 Use the **↶ / ↷** buttons or **Edit** menu to undo/redo library edits, removals, favourites and layout changes during the current session. This history ends when the application closes. Undo changes your library; it does not reverse commands already sent to a modem.
 
@@ -232,10 +346,99 @@ Use the **↶ / ↷** buttons or **Edit** menu to undo/redo library edits, remov
 
 ## Usage
 
+**Serial compatibility:** the default is **115200, 8N1, flow control None, CR command ending,
+DTR and RTS asserted**. Earlier ModemDiag builds always sent CRLF. **Serial…** in the connection
+bar selects CR, CRLF or LF, data bits, parity, stop bits and initial DTR/RTS states for the next
+connection. Match these to the working serial terminal. These choices currently last for the
+application session. Receive parsing accepts CR, LF and CRLF and joins fragmented USB data.
+Raw automation payload bytes are unaffected by the command-ending choice. Some drivers can briefly
+assert DTR/RTS on open, even when another initial state is requested; see the
+[pySerial control-line documentation](https://pyserial.readthedocs.io/en/latest/pyserial_api.html#serial.Serial.open).
+
+**Modem resets and USB removal:** read/write errors and repeated disappearance from the detected
+port list close the old connection, stop active work and keep the log already written. Queued events
+from that connection cannot affect a later connection. Wait for the modem to return, select the
+correct AT port (the COM number may change), then Connect. Commands and interrupted suites are not
+automatically resent. Auto-Detect and Connect cannot open a port at the same time.
+
+For a hardware comparison, close the other terminal first, match its serial settings, then try
+`AT`, `ATI` and `AT+CFUN?` and retain the exact TX/RX log. Compare CR and CRLF if command acceptance
+differs. For reset testing, check idle and running-suite cases, port disappearance/reappearance,
+manual reconnect and a fresh `AT` response. General tests use synthetic devices and Linux
+pseudo-terminals; Windows USB drivers and modem-specific behavior still need hardware verification.
+
 1. Plug in the modem, pick the port (the AT port is pre-selected when detected), set the baud rate (usually 115200), then click **Connect**.
-2. **Commands tab**: choose the vendor and optional model/firmware profile, then click a command. Buttons marked ⚙ take parameters. Right-click a button to edit it, remove it or add it to Favourites.
-3. **Automation tab**: select a suite and click **▶ Run**. Select a step to edit *Expect*, *Match*, *Timeout*, *Delay* and *On Failure*. Expand **Completion / payload** for asynchronous responses or raw input, then click **💾 Save**.
-4. Type any AT command in the terminal at the bottom right and press Enter.
+2. **Dashboard tab**: click **Refresh** for the radio overview. Click a cell in the diagram or table to inspect its identity, band, channel, area, PLMN and reported measurements. Choose a metric above the signal chart. **Live · 10 s** polls while this tab is visible and pauses during manual commands and automation. **Terminal** opens AT traffic beside the dashboard; queries and responses are also written to the session log.
+3. **AT Commands tab**: choose the vendor and optional model/firmware profile, then click a command. Buttons marked ⚙ take parameters. Right-click a button to edit it, remove it or add it to Favourites.
+4. **Automation tab**: select a suite and click **▶ Run**. Select a step to edit *Expect*, *Match*, *Timeout*, *Delay* and *On Failure*. Expand **Completion / payload** for asynchronous responses or raw input, then click **💾 Save**.
+5. **AI Diag ★ Beta tab**: configure an AI provider, enter your API key and model ID, then click **Test AI connection**. Describe the issue and choose chat, reviewed commands or automatic read diagnostics. See the [AI setup and controls](#ai-diag--beta) below.
+6. Type any AT command in the terminal at the bottom right and press Enter.
+
+The dashboard uses read queries and leaves registration reporting and operator selection unchanged.
+IMS is read with `AT+CIREG?`; an unsupported query shows **Not reported**, independently of LTE/5G
+registration. A numeric operator response is displayed as its **PLMN** code. Standard serving-cell
+details depend on the modem's existing registration reporting settings. Additional cell queries are
+selected from `ATI`: Quectel `QENG` (LTE/5G serving and LTE neighbour layouts) and Fibocom FM350
+`GTCCINFO` (UMTS/LTE/NR layouts). Other models retain the standard overview; vendor formats that
+cannot be decoded remain visible in the terminal. The dashboard does not run an operator scan.
+An automation started during a refresh waits for the active query sequence before running.
+
+Signal decoding follows [3GPP TS 27.007](https://www.etsi.org/deliver/etsi_ts/127000_127099/127007/18.06.00_60/ts_127007v180600p.pdf).
+Quantized readings show an estimate (`≈`) or a measurement limit (`<`, `≥`); each cell row's tooltip
+includes the original response. Cell positions form a schematic, without geographic coordinates or
+distance estimates. Solid lines identify serving cells and dotted lines identify reported neighbours.
+The comparison note only compares RSRP on the same radio technology and channel.
+
+Signal history retains the last 120 refreshes for this connection, with gaps for missing readings.
+The event feed records observed operator, radio, registration, serving-cell and data-context changes;
+polling can miss changes between refreshes. **Data contexts** lists APNs, activation state, protocol
+and reported IPv4/IPv6 addresses, using `CGDCONT?`, `CGACT?` and `CGPADDR` read queries. An IP address
+alone does not verify Internet access. History is cleared on disconnect/reconnect and is not saved.
+
+### AI Diag ★ Beta
+
+Choose **OpenAI**, enter a model available to your API account (the editable default is
+`gpt-6.1-terra`), and paste an API key into the masked field. **Get an OpenAI API key** opens the
+[official API dashboard](https://platform.openai.com/api-keys). Alternatively, launch the app with
+`OPENAI_API_KEY` set. This is API-key authentication; the tab does not sign in through the ChatGPT
+website. [ChatGPT and API billing are separate](https://help.openai.com/en/articles/9039756-managing-billing-for-chatgpt-and-the-api-platform).
+**Test AI connection** makes a small model request without modem context and may consume API tokens.
+
+For another provider or a local server, choose **OpenAI-compatible / local**, enter its API base URL
+(including `/v1` where required), model ID and optional API key. HTTPS is required for remote servers;
+HTTP is accepted for localhost/loopback servers. This mode uses `/chat/completions`; OpenAI uses the
+[Responses API with structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs).
+Compatibility depends on the server and model. Replies that do not follow the command schema are
+displayed as chat text and never converted into executable commands.
+
+- **Chat only** offers advice without scheduling AT commands.
+- **Review & run commands** presents a plan. Read queries are checked; supported configuration changes
+  are unchecked. Select the desired steps and click **Run selected & analyze** to execute up to six
+  commands and send the observed results back to the AI.
+- **Auto diagnostics · read queries** runs only the app's explicit read allowlist, for up to four
+  command rounds / 24 queries, followed by a final summary when needed. Failure or timeout stops
+  automatic execution. Changes remain queued for review. Unknown commands, resets, PIN writes,
+  firmware/file operations and payload commands are **Manual only** and cannot run through AI Diag.
+  Their text can be copied for separate manual review.
+
+**Stop** cancels the pending API request, any queued follow-up and AI's active AT sequence. AI,
+Automation, manual sends and dashboard polling coordinate through the existing command runner;
+AI commands are refused while another modem operation is busy. Disconnect, release revocation and
+closing the app stop AI modem control. Sent commands and modem responses appear in Terminal and
+session logs. Stop does not undo commands already sent.
+
+**Share modem overview** attaches the dashboard snapshot; **Share recent terminal lines** is off by
+default and attaches up to 60 recent lines when enabled. **Preview shared context** shows the context
+and conversation that will be supplied. Credentials and long device identifiers are redacted where
+recognized; review the preview before sharing logs. Conversation history and selected command
+results are sent to the chosen provider for analysis. OpenAI requests set `store: false`; provider-side
+retention follows that provider's policy. Changing AI connection settings starts a new conversation;
+modem connection changes clear the diagnostic conversation to avoid carrying another device's state.
+
+`ai-settings.json` stores only provider, base URL and model. API keys are neither saved there nor
+written to the session log; they must be re-entered after restart or supplied through the environment.
+AI chats remain in memory and are not saved. This beta is covered by automated tests; diagnosis
+quality and vendor command support depend on the chosen model and modem.
 
 Press **F1**, or open **Help → How to Use…**, for a short guide to editing, drag-and-drop, parameters and automation. Drag a command onto another within the same category to swap them. Manual sends are blocked while automation is running so their responses cannot interfere with the sequence; disconnecting stops the sequence.
 
@@ -299,10 +502,24 @@ with **Common only**; **All steps** explicitly runs every vendor's steps. Untagg
 Uncheck a step to keep it in the workflow while skipping execution. Existing module-specific command
 forms are retained; confirmed syntax corrections are scoped to the documented module families.
 A passing step means its configured response conditions were met. Built-in SIM readiness, attachment
-and registration checks now validate response values; registration checks require home/roaming status
+and technology-specific registration checks validate response values; registration checks require home/roaming status
 1 or 5. Other queries can still pass simply because the command succeeded. Custom macros retain
 substring matching unless **Regex** is selected. A valid GNSS fix or remote delivery requires its own
 explicit condition.
+
+Generic examples now include **Device Inventory (read-only)** for support reports, **APN & Data Session
+(read-only)** for registered-but-no-data investigations, and **IoT Power Saving (read-only)** for PSM/eDRX
+reachability issues. The registration snapshot reads multiple domains without enabling the radio; it
+does not require every domain to be registered. The LTE example also leaves radio, echo and error
+settings unchanged. Data queries inspect all contexts rather than assuming CID 1. The 5G suite checks
+5GS registration and reads EPS as context: standalone 5G need not have EPS registration; NSA can report
+EPS registration without 5GS registration. Review returned states and addresses: query success alone
+does not establish a working data connection. Optional/unsupported commands can fail and continue.
+
+Generic context and power-saving query syntax follows
+[3GPP TS 27.007 / ETSI TS 127 007](https://www.etsi.org/deliver/etsi_ts/127000_127099/127007/14.07.00_60/ts_127007v140700p.pdf)
+(clauses 7.38–7.41 and 10.1.10, 10.1.14, 10.1.23). Hardware/firmware support varies. Fibocom examples
+are unchanged. Existing saved automation copies are kept when bundled examples are updated.
 
 For asynchronous operations, set `wait_for` to a completion regex and optionally `fail_on` to a failure
 regex. The runner waits for both the successful final response and the completion message, even when
@@ -391,7 +608,7 @@ You can also reach me through my GitHub profile: [@yassineflag](https://github.c
 ModemDiag's own source retains this MIT license. The combined open-source executable is distributed
 under GPLv3 terms because it includes PyQt6. Third-party components retain their respective licenses
 and copyright notices. Each binary ZIP includes one `NOTICES.txt` containing full license texts and
-exact dependency-source links. Download `ModemDiag-1.1-source.zip` separately from the same release
+exact dependency-source links. Download `ModemDiag-1.2-source.zip` separately from the same release
 page for the matching application source, build scripts and both platforms' build records.
 See [third-party notices](docs/THIRD_PARTY_NOTICES.md) and Help → Licenses in the application.
 

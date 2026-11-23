@@ -18,6 +18,7 @@ import re
 import shutil
 from pathlib import Path
 import yaml
+from modemdiag.core.yaml_utils import safe_load
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QSplitter, QGridLayout,
     QListWidget, QListWidgetItem, QPushButton, QLabel,
@@ -42,7 +43,7 @@ _BUNDLED_EXAMPLES = {"example_lte_check.yaml", "example_simcom_mqtt.yaml",
 
 def _load_yaml(path: str) -> dict:
     with open(path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
+        return safe_load(f) or {}
 
 
 def _save_yaml(path: str, data: dict):

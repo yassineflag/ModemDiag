@@ -69,26 +69,27 @@ QStatusBar {
 
 /* ── Tab widget ──────────────────────────────────────────────── */
 QTabWidget::pane {
-    border: 1px solid #21262d;
-    border-radius: 0 6px 6px 6px;
+    border: 1px solid #30363d;
+    border-top: 2px solid #30363d;
+    border-radius: 0;
     background-color: #0d1117;
-    top: -1px;
 }
 QTabBar::tab {
-    background-color: #0d1117;
-    color: #8b949e;
+    background-color: #161b22;
+    color: #c9d1d9;
     padding: 8px 18px;
-    border: 1px solid transparent;
-    border-bottom: none;
-    border-radius: 6px 6px 0 0;
-    margin-right: 2px;
+    border: 1px solid #30363d;
+    border-bottom: 3px solid #30363d;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    margin-right: 4px;
     min-width: 80px;
 }
 QTabBar::tab:selected {
-    background-color: #161b22;
+    background-color: #1f3a5f;
     color: #58a6ff;
-    border-color: #21262d;
-    border-bottom: 2px solid #58a6ff;
+    border-bottom: 3px solid #58a6ff;
+    font-weight: 600;
 }
 QTabBar::tab:hover:!selected { background-color: #1c2128; color: #e6edf3; }
 

@@ -1,0 +1,23 @@
+name: "Device Inventory (read-only)"
+description: "Capture module identity, firmware, radio functionality and SIM readiness for a support report. Does not read subscriber identifiers or change configuration."
+icon: "📋"
+steps:
+  - command: "AT"
+    description: "Check AT interface"
+    expect: "OK"
+    on_failure: stop
+  - command: "AT+CGMI"
+    description: "Manufacturer identification"
+    expect: "OK"
+  - command: "AT+CGMM"
+    description: "Model identification"
+    expect: "OK"
+  - command: "AT+CGMR"
+    description: "Firmware revision"
+    expect: "OK"
+  - command: "AT+CFUN?"
+    description: "Current functionality level"
+    expect: "+CFUN:"
+  - command: "AT+CPIN?"
+    description: "SIM readiness; no PIN is sent"
+    expect_regex: '^\+CPIN:\s*READY\s*$'

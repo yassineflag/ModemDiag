@@ -1,0 +1,23 @@
+name: "APN & Data Session (read-only)"
+description: "Troubleshoot registered-but-no-data: read attach, configured APNs, context activation, assigned addresses and dynamic parameters. No APN writes, attach, activation or traffic. A successful query does not prove Internet access; review the returned values. Unsupported queries may fail."
+icon: "🌐"
+steps:
+  - command: "AT+CGATT?"
+    description: "Verify packet service attached"
+    expect_regex: '^\+CGATT:\s*1\s*$'
+  - command: "AT+CGDCONT?"
+    description: "List configured APNs and protocols (empty list can return OK)"
+    expect: "OK"
+  - command: "AT+CGACT?"
+    description: "List activation state by CID: 1 active, 0 inactive"
+    expect: "OK"
+  - command: "AT+CGPADDR"
+    description: "Read addresses for all contexts; unspecified/zero addresses are not usable IPs"
+    expect: "OK"
+  - command: "AT+CGCONTRDP"
+    description: "Read active context parameters including DNS when reported"
+    expect: "OK"
+    timeout_ms: 5000
+  - command: "AT+CEER"
+    description: "Read last extended error; may describe an older operation"
+    expect: "OK"

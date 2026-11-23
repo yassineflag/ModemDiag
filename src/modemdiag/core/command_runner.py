@@ -7,7 +7,7 @@ import re
 
 from PyQt6.QtCore import QObject, QTimer, pyqtSignal
 
-from modemdiag.core.at_parser import split_lines, LineType
+from modemdiag.core.at_parser import split_lines, complete_lines, LineType
 
 class CommandRunner(QObject):
     """
@@ -40,6 +40,7 @@ class CommandRunner(QObject):
     step_started   = pyqtSignal(int, str, str)
     step_result    = pyqtSignal(int, str, bool)
     suite_finished = pyqtSignal(bool, list)
+    payload_sent   = pyqtSignal(bytes)
 
     def __init__(self, serial_manager, parent=None):
         super().__init__(parent)
@@ -131,7 +132,7 @@ class CommandRunner(QObject):
         self._waiting = True
         self._timer.start(timeout)
         ok, err = self._serial.send(cmd)
-        if not ok:
+        if not ok and self._running and self._waiting:
             self._timer.stop()
             self._complete(f"SEND ERROR: {err}", False)
 
@@ -141,7 +142,7 @@ class CommandRunner(QObject):
         cmd    = self._active_command.upper()
 
         # Only complete lines count — a chunk may end mid-line.
-        complete = self._buf.rsplit("\n", 1)[0] if "\n" in self._buf else ""
+        complete, _ = complete_lines(self._buf)
         # Drop the ATE1 echo so e.g. "AT+QIGETERROR" isn't read as an ERROR.
         lines = [(s, k) for s, k in split_lines(complete) if s.upper() != cmd]
         # Some Sierra firmware reports a failed GNSS operation followed by OK.
@@ -165,7 +166,9 @@ class CommandRunner(QObject):
                 self._buf = self._buf[prompt.end():]
                 self._payload_sent = True
                 ok, err = self._serial.send_raw(self._payload)
-                if not ok:
+                if ok:
+                    self.payload_sent.emit(self._payload)
+                if not ok and self._running and self._waiting:
                     self._timer.stop()
                     self._complete(f"PAYLOAD ERROR: {err}", False)
                 elif self._waiting:
