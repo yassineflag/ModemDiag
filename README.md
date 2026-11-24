@@ -2,7 +2,8 @@
 
 Version **1.2**
 
-See the [1.2 progress and verification record](docs/CHANGELOG.md) for completed work and outstanding Windows/hardware checks.
+See [what changed from v1.1 to v1.2](docs/CHANGELOG.md), including the CRLF → CR default
+command-ending change and the Windows folder-bundle instructions.
 
 **An open-source AT command tester and diagnostic tool for cellular modems (LTE / 5G / NB-IoT / GNSS).**
 

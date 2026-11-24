@@ -1,9 +1,10 @@
 # ModemDiag progress and verification
 
-## 1.2 — Linux release, 2026-11-23
+## 1.2 — Linux and Windows, 2026-11-23 / 2026-11-24
 
-Version 1.2 ships a Linux x86_64 release and matching source archive. A Windows 1.2
-binary will follow separately; no signing-service approval or app-store submission is claimed.
+Linux x86_64 was released on 2026-11-23. The Windows x64 package was added on
+2026-11-24. The changes below compare v1.2 with v1.1; no signing-service approval
+or app-store submission is claimed.
 
 ### Interface and everyday use
 
@@ -11,8 +12,12 @@ binary will follow separately; no signing-service approval or app-store submissi
 - Simplified Help → Updates to show the app version and update information, with technical
   and privacy information behind Show Details. Automatic checking, offline behavior and
   signed release restrictions remain unchanged.
-- Reduced the dashboard's network, radio, received-power and data-session summaries.
-- Retained the network overview, cell exploration, signal history and AI Diag beta.
+- Added the Dashboard as the first tab: operator and radio details, signal history,
+  SIM and CS/PS/LTE/5G/IMS registration, data contexts and an interactive serving/neighbour
+  cell view. Cells are schematic; reported detail depends on modem support.
+- Added AI Diag ★ Beta as the fourth tab, with OpenAI/OpenAI-compatible API connections,
+  diagnostic chat, reviewed command plans and bounded automatic read queries. API keys
+  and conversations stay in memory; configuration changes require review.
 - Added configuration ZIP export/import, validation, automatic backups and immediate reload.
   Saved command edits, favorites, automations, theme and AI preferences transfer between PCs.
   Logs, AI API keys and chats are excluded. Modem-internal settings are not captured.
@@ -28,7 +33,8 @@ binary will follow separately; no signing-service approval or app-store submissi
   Fibocom-provided examples were left unchanged.
 - Fixed manually typed ports retaining a previous port selection and scans replacing explicit choices.
 - Added CR, CRLF and LF send endings, serial framing and initial DTR/RTS controls. The default
-  command ending is now CR. Raw payload bytes remain exact.
+  command ending changed from **CRLF (v1.1) to CR (v1.2)**. Choose CRLF in Serial…
+  if your modem needs the earlier behavior. Raw payload bytes remain exact.
 - Joined fragmented receive data, preserved split UTF-8 characters, and accepted CR-only final results.
 - Closed stale handles after USB read/write failures and observed port removal; stopped active
   work and ignored old-session events after reconnect. Interrupted commands are not resent.
@@ -41,6 +47,8 @@ binary will follow separately; no signing-service approval or app-store submissi
   this excludes executable extraction and is not a Windows benchmark.
 - Changed Windows builds to a folder bundle to avoid repeated extraction, disabled UPX and
   added product/version metadata. Linux still offers a single-file build and optional folder build.
+- Windows users must extract the complete ZIP and run `ModemDiag-app/ModemDiag.exe`;
+  keep `_internal` alongside the executable instead of copying only the EXE.
 - Added Windows Authenticode signing/verification support and complete folder-bundle inventory checks.
 - Documented free SignPath Foundation and Microsoft Store MSIX distribution routes.
   No signing identity has been obtained; no SignPath approval or Store submission is in place.
@@ -56,6 +64,9 @@ binary will follow separately; no signing-service approval or app-store submissi
 - Linux single-file and folder bundles were built and passed isolated GUI startup checks.
 - Dashboard, terminal/command, automation, AI and the simplified Updates dialog have
   dark and light previews in `docs/`.
+- The supplied Windows x64 ZIP passed archive integrity checks; the embedded application
+  reports 1.2, includes the new feature modules, and matches all 55 reviewed native-library
+  hashes. The existing source ZIP includes the verified Windows bootstrap build inputs.
 - Windows startup timing, actual Authenticode signing and real Windows USB driver behavior
   still require verification on Windows.
 - The reported modem-specific command failure is not yet reproduced. Compare the exact TX/RX
